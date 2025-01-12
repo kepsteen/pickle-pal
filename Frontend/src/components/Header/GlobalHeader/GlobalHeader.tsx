@@ -5,16 +5,21 @@ export default function GlobalHeader() {
 	return (
 		<header>
 			<nav className="p-4 ">
-				<ul className="flex justify-between items-center [&_svg]:w-8 [&_svg]:h-8">
-					<li className="">
-						<NavLink to="">
-							<div className="w-20 h-20">
+				<ul className="flex justify-between items-center [&_svg]:w-8 [&_svg]:h-8 container-padding">
+					<li>
+						<NavLink to="" className="flex items-center gap-2">
+							<div className="w-12 h-12">
 								<img
 									src="/pickle-pal-icon.svg"
 									alt="pickle pal logo"
 									className="w-full h-full"
 								/>
 							</div>
+							<p className="hidden text-2xl font-bold sm:block">
+								<em>
+									<span className="text-primary">Pickle</span> Pal
+								</em>
+							</p>
 						</NavLink>
 					</li>
 					<li className="[&_svg]:text-primary">
