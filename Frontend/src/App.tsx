@@ -1,10 +1,11 @@
 import { Outlet } from "react-router";
-import Header from "./components/Header/Header";
+
+import GlobalHeader from "./components/Header/GlobalHeader/GlobalHeader";
 
 function App() {
 	return (
 		<>
-			<Header />
+			<GlobalHeader />
 			<Outlet />
 			<h1 className="text-red-400">Hello World</h1>
 		</>

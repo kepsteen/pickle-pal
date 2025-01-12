@@ -46,7 +46,7 @@ export default function LoginPage() {
 						className="border border-black"
 					/>
 				</label>
-				<button className="p-2 border border-black">submit</button>
+				<button className="btn btn-primary">submit</button>
 			</form>
 		</>
 	);
