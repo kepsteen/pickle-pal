@@ -14,6 +14,7 @@ export default {
 					"base-200": "oklch(15% 0.08 209)",
 					"base-300": "oklch(10% 0.08 209)",
 					"base-content": "oklch(98% 0.016 73.684)",
+					muted: "oklch(70% 0.012 75)",
 					primary: "oklch(92% 0.2653 125)",
 					"primary-content": "oklch(50% 0.2653 125)",
 					secondary: "oklch(83.27% 0.0764 298.3)",
