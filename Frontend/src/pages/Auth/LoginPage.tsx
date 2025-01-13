@@ -1,4 +1,4 @@
-import { useSignIn } from "@clerk/clerk-react";
+// import { useSignIn } from "@clerk/clerk-react";
 import {
 	Card,
 	CardContent,
@@ -9,25 +9,44 @@ import Label from "../../components/Label/Label";
 import { Input } from "../../components/Input/Input";
 import Button from "../../components/Button/Button";
 import { NavLink } from "react-router";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { cn } from "../../lib/utils";
+import { Eye, EyeOff } from "lucide-react";
+
+type LoginFormData = {
+	email: string;
+	password: string;
+};
 
 export default function LoginPage() {
-	const { signIn } = useSignIn();
+	const [isPending, setIsPending] = useState(false);
+	const [showPassword, setShowPassword] = useState(false);
 
-	async function handleSubmit(e: React.FormEvent, formData: FormData) {
-		e.preventDefault();
+	// const { signIn } = useSignIn();
+	const {
+		register,
+		handleSubmit,
+		formState: { errors },
+	} = useForm<LoginFormData>();
+
+	async function onSubmit(data: LoginFormData) {
+		setIsPending(true);
 		try {
-			const email = formData.get("email") as string;
-			const password = formData.get("password") as string;
-			const result = await signIn?.create({
-				identifier: email,
-				strategy: "password",
-				password,
-			}); // Todo: Add Loading state
-			alert(`Email: ${email}, Password: ${password}, Result: ${result}`);
+			console.log("data", data);
+			// const result = await signIn?.create({
+			// 	identifier: data.email,
+			// 	strategy: "password",
+			// 	password: data.password,
+			// });
+			// Todo: Add Loading state
 		} catch (error) {
 			console.error("Error signing up", error);
+		} finally {
+			setIsPending(false);
 		}
 	}
+
 	return (
 		<>
 			<Card>
@@ -40,30 +59,55 @@ export default function LoginPage() {
 				<CardContent>
 					<form
 						className="flex flex-col gap-4"
-						onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
-							e.preventDefault();
-							const formData = new FormData(e.currentTarget);
-							handleSubmit(e, formData);
-						}}
+						onSubmit={handleSubmit(onSubmit)}
 					>
 						<Label className="p-0">
 							<span className="sr-only">Email</span>
-							<Input type="text" name="email" placeholder="Email" />
+							<Input
+								{...register("email")}
+								type="text"
+								name="email"
+								placeholder="Email"
+								className={errors.email && "input-error"}
+							/>
+							{errors.email && (
+								<span className="text-error">{errors.email.message}</span>
+							)}
 						</Label>
-						<Label className="p-0">
+						<Label className="relative p-0">
 							<span className="sr-only">Password</span>
-							<Input type="password" name="password" placeholder="Password" />
+							<Input
+								{...register("password")}
+								type={showPassword ? "password" : "text"}
+								name="password"
+								placeholder="Password"
+								className={errors.password && "input-error"}
+							/>
+							<button onClick={() => setShowPassword(!showPassword)}>
+								{showPassword ? (
+									<Eye className="absolute right-3 top-1 text-base-content/60" />
+								) : (
+									<EyeOff className="absolute right-3 top-1 text-base-content/60" />
+								)}
+							</button>
+							{errors.password && (
+								<span className="text-error">{errors.password.message}</span>
+							)}
 						</Label>
-						<Button variant="primary" shape="block" className="mt-2">
-							Login
+						<Button
+							variant="primary"
+							shape="block"
+							className={cn("mt-2", isPending ? "btn-disabled" : "")}
+						>
+							Sign Up
 						</Button>
-						<p>
-							Don&apos;t have an account yet?{" "}
-							<NavLink to="/register" className="underline hover:text-primary">
-								Sign Up
-							</NavLink>
-						</p>
 					</form>
+					<p>
+						Don&apos;t have an account yet?{" "}
+						<NavLink to="/register" className="underline hover:text-primary">
+							Sign Up
+						</NavLink>
+					</p>
 				</CardContent>
 			</Card>
 		</>

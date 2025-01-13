@@ -79,7 +79,6 @@ export default function SignUpPage() {
 							placeholder="Email"
 							className={errors.email && "input-error"}
 						/>
-
 						{errors.email && (
 							<span className="text-error">{errors.email.message}</span>
 						)}
@@ -133,13 +132,13 @@ export default function SignUpPage() {
 					>
 						Sign Up
 					</Button>
-					<p>
-						Already have an account?{" "}
-						<NavLink to="/login" className="underline hover:text-primary">
-							Login
-						</NavLink>
-					</p>
 				</form>
+				<p>
+					Already have an account?{" "}
+					<NavLink to="/login" className="underline hover:text-primary">
+						Login
+					</NavLink>
+				</p>
 			</CardContent>
 		</Card>
 	);
