@@ -48,7 +48,7 @@ export default function SignUpPage() {
 		setIsPending(true);
 		try {
 			console.log("data", data);
-			const result = await signUp?.create({
+			await signUp?.create({
 				emailAddress: data.email,
 				password: data.password,
 			});

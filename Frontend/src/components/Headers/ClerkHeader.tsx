@@ -5,7 +5,7 @@ import {
 	UserButton,
 } from "@clerk/clerk-react";
 
-export default function Header() {
+export default function ClerkHeader() {
 	return (
 		<header>
 			<SignedOut>

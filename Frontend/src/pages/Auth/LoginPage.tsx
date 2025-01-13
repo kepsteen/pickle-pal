@@ -1,4 +1,4 @@
-// import { useSignIn } from "@clerk/clerk-react";
+import { useSignIn } from "@clerk/clerk-react";
 import {
 	Card,
 	CardContent,
@@ -23,7 +23,7 @@ export default function LoginPage() {
 	const [isPending, setIsPending] = useState(false);
 	const [showPassword, setShowPassword] = useState(false);
 
-	// const { signIn } = useSignIn();
+	const { signIn } = useSignIn();
 	const {
 		register,
 		handleSubmit,
@@ -34,11 +34,11 @@ export default function LoginPage() {
 		setIsPending(true);
 		try {
 			console.log("data", data);
-			// const result = await signIn?.create({
-			// 	identifier: data.email,
-			// 	strategy: "password",
-			// 	password: data.password,
-			// });
+			await signIn?.create({
+				identifier: data.email,
+				strategy: "password",
+				password: data.password,
+			});
 			// Todo: Add Loading state
 		} catch (error) {
 			console.error("Error signing up", error);
@@ -99,13 +99,13 @@ export default function LoginPage() {
 							shape="block"
 							className={cn("mt-2", isPending ? "btn-disabled" : "")}
 						>
-							Sign Up
+							Login
 						</Button>
 					</form>
 					<p>
 						Don&apos;t have an account yet?{" "}
 						<NavLink to="/register" className="underline hover:text-primary">
-							Sign Up
+							Signup
 						</NavLink>
 					</p>
 				</CardContent>
