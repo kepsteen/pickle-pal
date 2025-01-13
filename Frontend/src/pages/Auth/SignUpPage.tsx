@@ -34,11 +34,7 @@ export default function SignUpPage() {
 			signUpSchema.refine(uniqueEmail, {
 				message: "An account already exists for this email",
 				path: ["email"],
-			}),
-			undefined,
-			{
-				mode: "async",
-			}
+			})
 		),
 		mode: "onSubmit",
 	});
@@ -101,12 +97,11 @@ export default function SignUpPage() {
 					<Label className="p-0">
 						<span className="sr-only">Email</span>
 						<Input
-							{...register("email")}
+							{...register("email", { onChange: uniqueEmail.invalidate })}
 							type="text"
 							name="email"
 							placeholder="Email"
 							className={errors.email && "input-error"}
-							onChange={() => uniqueEmail.invalidate()}
 						/>
 						{errors.email && (
 							<span className="text-error">{errors.email.message}</span>
