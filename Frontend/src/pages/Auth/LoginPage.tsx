@@ -6,7 +6,7 @@ import {
 	CardTitle,
 } from "../../components/Card/Card";
 import Label from "../../components/Label/Label";
-import Input from "../../components/Input/Input";
+import { Input } from "../../components/Input/Input";
 import Button from "../../components/Button/Button";
 import { NavLink } from "react-router";
 

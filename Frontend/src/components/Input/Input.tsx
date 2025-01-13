@@ -1,10 +1,10 @@
-import { InputHTMLAttributes, ReactNode } from "react";
+import { forwardRef, InputHTMLAttributes } from "react";
 import { cn } from "../../lib/utils";
 
 interface InputProps
 	extends Omit<InputHTMLAttributes<HTMLInputElement>, "size"> {
-	children?: ReactNode;
 	className?: string;
+	name: string;
 	variant?:
 		| "primary"
 		| "secondary"
@@ -33,19 +33,22 @@ const sizes = {
 	lg: "input-lg",
 };
 
-export default function Input({
-	children,
-	className,
-	variant = "primary",
-	size = "sm",
-	...props
-}: InputProps) {
-	return (
-		<input
-			{...props}
-			className={cn("input w-full", variants[variant], sizes[size], className)}
-		>
-			{children}
-		</input>
-	);
-}
+export const Input = forwardRef<HTMLInputElement, InputProps>(
+	({ className, variant = "primary", size = "sm", name, ...props }, ref) => {
+		return (
+			<input
+				{...props}
+				ref={ref}
+				name={name}
+				className={cn(
+					"input w-full",
+					variants[variant],
+					sizes[size],
+					className
+				)}
+			/>
+		);
+	}
+);
+
+Input.displayName = "Input";

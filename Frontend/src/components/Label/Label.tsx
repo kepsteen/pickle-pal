@@ -8,7 +8,7 @@ type LabelProps = LabelHTMLAttributes<HTMLLabelElement> & {
 
 export default function Label({ children, className, ...props }: LabelProps) {
 	return (
-		<label {...props} className={cn("label w-full", className)}>
+		<label {...props} className={cn("label w-full flex flex-col", className)}>
 			{children}
 		</label>
 	);
