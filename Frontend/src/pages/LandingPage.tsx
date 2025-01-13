@@ -1,3 +1,5 @@
+import ClerkHeader from "../components/Headers/ClerkHeader";
+
 export default function LandingPage() {
-	return <h1>Landing Page</h1>;
+	return <ClerkHeader />;
 }
