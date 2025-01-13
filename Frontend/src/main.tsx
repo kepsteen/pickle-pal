@@ -6,6 +6,8 @@ import { ClerkProvider } from "@clerk/clerk-react";
 import { BrowserRouter, Route, Routes } from "react-router";
 import LoginPage from "./pages/Auth/LoginPage.tsx";
 import SignUpPage from "./pages/Auth/SignUpPage.tsx";
+import AuthLayout from "./layouts/AuthLayout.tsx";
+import LandingPage from "./pages/LandingPage.tsx";
 
 // Import your Publishable Key
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
@@ -20,9 +22,10 @@ createRoot(document.getElementById("root")!).render(
 			<BrowserRouter>
 				<Routes>
 					<Route path="/" element={<App />}>
-						<Route path="auth">
+						<Route index element={<LandingPage />} />
+						<Route element={<AuthLayout />}>
 							<Route path="login" element={<LoginPage />} />
-							<Route path="sign-up" element={<SignUpPage />} />
+							<Route path="register" element={<SignUpPage />} />
 						</Route>
 					</Route>
 				</Routes>
