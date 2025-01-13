@@ -63,8 +63,6 @@ export default function SignUpPage() {
 
 			if (!response.ok) throw new Error(`Response status: ${response.status}`);
 			navigate("/home");
-
-			// Todo: Add Loading state
 		} catch (error) {
 			console.error("Error signing up", error);
 		} finally {
