@@ -14,6 +14,7 @@ export const createUser = async (req, res) => {
 export const verifyEmailExists = async (req, res) => {
 	try {
 		const { email } = req.params;
+		if (email === undefined) throw new Error("Email is required");
 		const profile = await User.find({ email });
 		if (profile.length !== 0) {
 			return res.status(200).json({ uniqueEmail: false });
