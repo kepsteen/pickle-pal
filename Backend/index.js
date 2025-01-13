@@ -1,19 +1,24 @@
-import express from "express";
+import express, { Router } from "express";
 import { MongoClient } from "mongodb";
 import "dotenv/config";
+import { usersRouter } from "./routes/user.js";
+import cors from "cors";
+import { connectDB } from "./db/connect.js";
 
 const app = express();
 const port = 3000;
 
-const mongo = new MongoClient(process.env.DB_URL);
-await mongo.connect();
-const databasesList = await mongo.db().admin().listDatabases();
+// Middleware
+app.use(cors());
 
-console.log("Databases:", databasesList);
+app.use(express.json());
+
 app.get("/", (req, res) => {
 	res.send("Hello World!");
 });
 
-app.listen(port, () => {
-	console.log(`Example app listening on port ${port}`);
+app.use("/api/users", usersRouter);
+
+connectDB().then(() => {
+	app.listen(port, () => console.log(`Server running on port ${port}`));
 });
