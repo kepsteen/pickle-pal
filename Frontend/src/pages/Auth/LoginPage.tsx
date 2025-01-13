@@ -33,7 +33,6 @@ export default function LoginPage() {
 	async function onSubmit(data: LoginFormData) {
 		setIsPending(true);
 		try {
-			console.log("data", data);
 			await signIn?.create({
 				identifier: data.email,
 				strategy: "password",

@@ -8,51 +8,66 @@ import {
 import Label from "../../components/Label/Label";
 import { Input } from "../../components/Input/Input";
 import Button from "../../components/Button/Button";
-import { NavLink } from "react-router";
+import { NavLink, useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
-import { cn } from "../../lib/utils";
+import { checkEmailToBeUnique, cn } from "../../lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { Eye, EyeOff } from "lucide-react";
-
-type SignUpFormData = {
-	email: string;
-	password: string;
-	confirmPassword: string;
-};
-
-const schema = z
-	.object({
-		email: z.string().email("Invalid email address"),
-		password: z.string().min(8, "Password must be at least 8 characters"),
-		confirmPassword: z.string(),
-	})
-	.refine((data) => data.password === data.confirmPassword, {
-		message: "Passwords must match",
-		path: ["confirmPassword"],
-	});
+import { SignUpFormData, signUpSchema } from "../../types/auth";
+import { PasswordInput } from "../../components/PasswordInput/PasswordInput";
+import useRefinement from "../../hooks/useRefinement";
 
 export default function SignUpPage() {
 	const [isPending, setIsPending] = useState(false);
-	const [showPassword, setShowPassword] = useState(false);
-
 	const { signUp } = useSignUp();
+
+	const uniqueEmail = useRefinement(checkEmailToBeUnique(), {
+		debounce: 1000,
+	});
+
 	const {
 		register,
 		handleSubmit,
 		formState: { errors },
-	} = useForm<SignUpFormData>({ resolver: zodResolver(schema) });
+	} = useForm<SignUpFormData>({
+		resolver: zodResolver(
+			signUpSchema.refine(uniqueEmail, {
+				message: "An account already exists for this email",
+				path: ["email"],
+			}),
+			undefined,
+			{
+				mode: "async",
+			}
+		),
+		mode: "onSubmit",
+	});
+	const navigate = useNavigate();
 
 	async function onSubmit(data: SignUpFormData) {
 		setIsPending(true);
 		try {
-			console.log("data", data);
 			await signUp?.create({
 				emailAddress: data.email,
 				password: data.password,
 			});
-			// Todo: create profile in DB
+			const response = await fetch(
+				`${import.meta.env.VITE_BASE_URL}/api/users`,
+				{
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({
+						firstName: data.firstName,
+						email: data.email,
+					}),
+				}
+			);
+
+			if (!response.ok) throw new Error(`Response status: ${response.status}`);
+			navigate("/home");
+
 			// Todo: Add Loading state
 		} catch (error) {
 			console.error("Error signing up", error);
@@ -71,6 +86,19 @@ export default function SignUpPage() {
 			<CardContent>
 				<form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
 					<Label className="p-0">
+						<span className="sr-only">First Name</span>
+						<Input
+							{...register("firstName")}
+							type="text"
+							name="firstName"
+							placeholder="First Name"
+							className={errors.firstName && "input-error"}
+						/>
+						{errors.firstName && (
+							<span className="text-error">{errors.firstName.message}</span>
+						)}
+					</Label>
+					<Label className="p-0">
 						<span className="sr-only">Email</span>
 						<Input
 							{...register("email")}
@@ -78,6 +106,7 @@ export default function SignUpPage() {
 							name="email"
 							placeholder="Email"
 							className={errors.email && "input-error"}
+							onChange={() => uniqueEmail.invalidate()}
 						/>
 						{errors.email && (
 							<span className="text-error">{errors.email.message}</span>
@@ -85,40 +114,24 @@ export default function SignUpPage() {
 					</Label>
 					<Label className="relative p-0">
 						<span className="sr-only">Password</span>
-						<Input
+						<PasswordInput
 							{...register("password")}
-							type={showPassword ? "password" : "text"}
 							name="password"
 							placeholder="Password"
 							className={errors.password && "input-error"}
 						/>
-						<button onClick={() => setShowPassword(!showPassword)}>
-							{showPassword ? (
-								<Eye className="absolute right-3 top-1 text-base-content/60" />
-							) : (
-								<EyeOff className="absolute right-3 top-1 text-base-content/60" />
-							)}
-						</button>
 						{errors.password && (
 							<span className="text-error">{errors.password.message}</span>
 						)}
 					</Label>
 					<Label className="relative p-0">
 						<span className="sr-only">Confirm Password</span>
-						<Input
+						<PasswordInput
 							{...register("confirmPassword")}
-							type={showPassword ? "password" : "text"}
 							name="confirmPassword"
 							placeholder="Confirm Password"
 							className={errors.confirmPassword && "input-error"}
 						/>
-						<button onClick={() => setShowPassword(!showPassword)}>
-							{showPassword ? (
-								<Eye className="absolute right-3 top-1 text-base-content/60" />
-							) : (
-								<EyeOff className="absolute right-3 top-1 text-base-content/60" />
-							)}
-						</button>
 						{errors.confirmPassword && (
 							<span className="text-error">
 								{errors.confirmPassword.message}
