@@ -49,9 +49,7 @@ export default function LoginPage() {
 	return (
 		<>
 			<Card>
-				<CardTitle className="mx-auto text-2xl font-semibold text-center">
-					Welcome Back
-				</CardTitle>
+				<CardTitle className="mx-auto text-center">Welcome Back</CardTitle>
 				<CardDescription>
 					Enter your credentials to access your Pickle Pal account
 				</CardDescription>
