@@ -10,8 +10,8 @@ export default {
 		themes: [
 			{
 				abyss: {
-					"base-100": "oklch(20% 0.08 209)",
-					"base-200": "oklch(15% 0.08 209)",
+					"base-100": "oklch(15% 0.08 209)",
+					"base-200": "oklch(20% 0.08 209)",
 					"base-300": "oklch(10% 0.08 209)",
 					"base-content": "oklch(98% 0.016 73.684)",
 					muted: "oklch(70% 0.012 75)",
