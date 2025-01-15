@@ -43,10 +43,12 @@ export default function SignUpPage() {
 	async function onSubmit(data: SignUpFormData) {
 		setIsPending(true);
 		try {
-			await signUp?.create({
+			const signUpResponse = await signUp?.create({
 				emailAddress: data.email,
 				password: data.password,
 			});
+			if (signUpResponse?.status !== "complete") return;
+
 			const response = await fetch(
 				`${import.meta.env.VITE_BASE_URL}/api/users`,
 				{
