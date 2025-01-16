@@ -1,5 +1,5 @@
 import { MapPinned, MessageSquare, UserCog, Users } from "lucide-react";
-import { NavLink } from "react-router-dom";
+import { NavLink } from "react-router";
 
 export default function GlobalHeader() {
 	return (

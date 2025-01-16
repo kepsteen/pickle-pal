@@ -8,9 +8,9 @@ import {
 import Label from "../../components/Label/Label";
 import { Input } from "../../components/Input/Input";
 import Button from "../../components/Button/Button";
-import { NavLink } from "react-router-dom";
+import { NavLink } from "react-router";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm } from "../../../node_modules/react-hook-form/dist";
 import { cn } from "../../lib/utils";
 import { Eye, EyeOff } from "lucide-react";
 

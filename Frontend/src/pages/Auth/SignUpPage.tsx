@@ -8,9 +8,8 @@ import {
 import Label from "../../components/Label/Label";
 import { Input } from "../../components/Input/Input";
 import Button from "../../components/Button/Button";
-import { useNavigate } from "react-router";
-import { NavLink } from "react-router-dom";
-import { useForm } from "react-hook-form";
+import { NavLink, useNavigate } from "react-router";
+import { useForm } from "../../../node_modules/react-hook-form/dist";
 import { useState } from "react";
 import { checkEmailToBeUnique, cn } from "../../lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -44,7 +43,7 @@ export default function SignUpPage() {
 	async function onSubmit(data: SignUpFormData) {
 		setIsPending(true);
 		try {
-			await signUp?.create({
+			const signUpResponse = await signUp?.create({
 				emailAddress: data.email,
 				password: data.password,
 			});
