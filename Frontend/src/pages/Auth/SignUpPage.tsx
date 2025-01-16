@@ -8,7 +8,8 @@ import {
 import Label from "../../components/Label/Label";
 import { Input } from "../../components/Input/Input";
 import Button from "../../components/Button/Button";
-import { NavLink, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
+import { NavLink } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { checkEmailToBeUnique, cn } from "../../lib/utils";

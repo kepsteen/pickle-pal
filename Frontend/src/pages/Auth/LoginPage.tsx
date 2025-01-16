@@ -8,7 +8,7 @@ import {
 import Label from "../../components/Label/Label";
 import { Input } from "../../components/Input/Input";
 import Button from "../../components/Button/Button";
-import { NavLink } from "react-router";
+import { NavLink } from "react-router-dom";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { cn } from "../../lib/utils";
