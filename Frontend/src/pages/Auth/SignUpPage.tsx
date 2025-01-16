@@ -9,7 +9,7 @@ import Label from "../../components/Label/Label";
 import { Input } from "../../components/Input/Input";
 import Button from "../../components/Button/Button";
 import { NavLink, useNavigate } from "react-router";
-import { useForm } from "react-hook-form";
+import { useForm } from "../../../node_modules/react-hook-form/dist";
 import { useState } from "react";
 import { checkEmailToBeUnique, cn } from "../../lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -47,21 +47,16 @@ export default function SignUpPage() {
 				emailAddress: data.email,
 				password: data.password,
 			});
-			if (signUpResponse?.status !== "complete") return;
-
-			const response = await fetch(
-				`${import.meta.env.VITE_BASE_URL}/api/users`,
-				{
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify({
-						firstName: data.firstName,
-						email: data.email,
-					}),
-				}
-			);
+			const response = await fetch(`/api/users`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					firstName: data.firstName,
+					email: data.email,
+				}),
+			});
 
 			if (!response.ok) throw new Error(`Response status: ${response.status}`);
 			navigate("/onboarding");
