@@ -1,4 +1,4 @@
-import { Outlet, NavLink } from "react-router";
+import { NavLink, Outlet } from "react-router";
 
 export default function AuthLayout() {
 	return (
