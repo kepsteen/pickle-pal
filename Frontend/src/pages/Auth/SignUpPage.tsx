@@ -9,7 +9,7 @@ import Label from "../../components/Label/Label";
 import { Input } from "../../components/Input/Input";
 import Button from "../../components/Button/Button";
 import { NavLink, useNavigate } from "react-router";
-import { useForm } from "../../../node_modules/react-hook-form/dist";
+import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { checkEmailToBeUnique, cn } from "../../lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -43,7 +43,7 @@ export default function SignUpPage() {
 	async function onSubmit(data: SignUpFormData) {
 		setIsPending(true);
 		try {
-			const signUpResponse = await signUp?.create({
+			await signUp?.create({
 				emailAddress: data.email,
 				password: data.password,
 			});
