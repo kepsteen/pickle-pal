@@ -5,7 +5,7 @@ import { ProfileImgInput } from "../components/ProfileImgInput/ProfileImgInput";
 import { Select } from "../components/Select/Select";
 import Button from "../components/Button/Button";
 import { cn } from "../lib/utils";
-import { useForm } from "../../node_modules/react-hook-form/dist";
+import { useForm } from "react-hook-form";
 import { ProfileFormData } from "../types/profileSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { profileSchema } from "../types/profileSchema";

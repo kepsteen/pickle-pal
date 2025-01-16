@@ -7,7 +7,13 @@ type CardProps = {
 };
 
 export const CardTitle = ({ children, className }: CardProps) => {
-	return <h3 className={cn("card-title px-8 pt-8", className)}>{children}</h3>;
+	return (
+		<h3
+			className={cn("card-title px-8 pt-8 text-2xl font-semibold", className)}
+		>
+			{children}
+		</h3>
+	);
 };
 
 export const CardDescription = ({ children, className }: CardProps) => {

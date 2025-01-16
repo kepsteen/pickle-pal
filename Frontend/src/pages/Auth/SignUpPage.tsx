@@ -43,7 +43,7 @@ export default function SignUpPage() {
 	async function onSubmit(data: SignUpFormData) {
 		setIsPending(true);
 		try {
-			await signUp?.create({
+			const signUpResponse = await signUp?.create({
 				emailAddress: data.email,
 				password: data.password,
 			});
@@ -59,7 +59,7 @@ export default function SignUpPage() {
 			});
 
 			if (!response.ok) throw new Error(`Response status: ${response.status}`);
-			navigate("/home");
+			navigate("/onboarding");
 		} catch (error) {
 			console.error("Error signing up", error);
 		} finally {
