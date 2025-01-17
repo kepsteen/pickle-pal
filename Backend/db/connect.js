@@ -1,7 +1,12 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 
-dotenv.config();
+// Load environment variables from the appropriate location
+if (process.env.NODE_ENV === "production") {
+	dotenv.config({ path: "/etc/app.env" });
+} else {
+	dotenv.config(); // Uses local .env file in development
+}
 
 export const connectDB = async () => {
 	try {
