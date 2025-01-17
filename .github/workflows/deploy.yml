@@ -55,5 +55,7 @@ jobs:
             # Install dependencies for both Frontend and Backend
             cd Frontend && npm ci --production
             cd ../Backend && npm ci --production
+            # Source environment variables
+            source /etc/app.env
             # Restart the systemd service
             sudo systemctl restart myapp.service
