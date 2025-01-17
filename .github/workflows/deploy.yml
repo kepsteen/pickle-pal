@@ -24,9 +24,13 @@ jobs:
           cache: "npm"
 
       - name: Install dependencies and build
+        env:
+          VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
         run: |
           # Install dependencies for Frontend
           cd Frontend
+          # Create .env file for Vite
+          echo "VITE_CLERK_PUBLISHABLE_KEY=$VITE_CLERK_PUBLISHABLE_KEY" > .env
           npm ci
           npm run build
 
