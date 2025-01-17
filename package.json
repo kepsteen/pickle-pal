@@ -6,8 +6,8 @@
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"build": "cd Frontend && npm i && npm run build",
 		"dev": "concurrently \"cd Backend && npm run dev\" \"cd Frontend && npm run dev\"",
-		"deploy": "git push --force origin main:pub",
-		"start": "npm start --prefix Backend"
+		"deploy": "git push --force origin dev:prod",
+		"start": "NODE_ENV=production npm start --prefix Backend"
 	},
 	"repository": {
 		"type": "git",
