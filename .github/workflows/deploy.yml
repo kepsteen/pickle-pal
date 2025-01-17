@@ -1,10 +1,9 @@
-name: Deploy
+name: Deploy to EC2
+
 on:
   push:
     branches:
-      - pub
-
-  # Allow deploy to be triggered manually
+      - prod
   workflow_dispatch:
 
 jobs:
@@ -13,16 +12,29 @@ jobs:
     env:
       EC2_HOST: ${{ secrets.EC2_HOST }}
       SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-    steps:
-      - name: Checkout source code
-        uses: actions/checkout@v3
 
-      - name: Build project
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies and build
         run: |
+          # Install dependencies for Frontend
+          cd Frontend
           npm ci
           npm run build
 
-      - name: Copy project to EC2
+          # Install dependencies for Backend
+          cd ../Backend
+          npm ci
+
+      - name: Deploy to EC2
         uses: burnett01/rsync-deployments@7.0.1
         with:
           switches: -avzr --delete
@@ -31,7 +43,8 @@ jobs:
           remote_host: ${{ env.EC2_HOST }}
           remote_user: ec2-user
           remote_key: "${{ env.SSH_PRIVATE_KEY }}"
-      - name: Install and run on EC2
+
+      - name: Install dependencies and restart service
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ env.EC2_HOST }}
@@ -39,5 +52,8 @@ jobs:
           key: ${{ env.SSH_PRIVATE_KEY }}
           script: |
             cd /home/ec2-user/project
-            sh scripts/ec2env.sh
-            pm2 start --time npm -- start
+            # Install dependencies for both Frontend and Backend
+            cd Frontend && npm ci --production
+            cd ../Backend && npm ci --production
+            # Restart the systemd service
+            sudo systemctl restart myapp.service
