@@ -33,6 +33,7 @@ Pickle Pal is a web application designed to help pickleball players connect with
 
 ## Project Structure
 
+```
 pickle-pal/
 ├── Frontend/ # Frontend React application
 │ ├── src/
@@ -58,6 +59,7 @@ pickle-pal/
 |
 │
 └── package.json # Root package.json for scripts
+```
 
 ## Getting Started
 
