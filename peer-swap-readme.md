@@ -10,6 +10,7 @@ Pickle Pal is a web application designed to help pickleball players connect with
 - **Authentication**: Clerk
 - **Styling**: TailwindCSS with DaisyUI
 - **Deployment**: AWS EC2
+- **Image Hosting**: AWS S3
 
 ## Key Libraries & Packages
 
@@ -50,8 +51,11 @@ pickle-pal/
 │
 ├── Backend/ # Backend Express application
 │ ├── controllers/ # Route controllers
+| |── db/ #DB connection logic
 │ ├── models/ # MongoDB schemas
-│ └── routes/ # API routes
+│ ├── routes/ # API routes
+| └──indes.js # Entry point for the node server
+|
 │
 └── package.json # Root package.json for scripts
 
@@ -98,7 +102,9 @@ AWS_SECRET_ACCESS_KEY="addMe"
 AWS_REGION="addMe"
 ```
 
-4. Run the project locally
+4. Whitelist your IP in MongoDB Atlas
+
+5. Run the project locally
 
 ```bash
 # In root directory (Runs both React App and Node server)
@@ -122,3 +128,25 @@ npm run dev
    - Create a custom component for card
    - Use some hard-coded data to fill in the card like in the figma file
    - Build the markup for mobile first then make it responsive on larger screens with tailwind's built in breakpoints
+
+## Contributing
+
+I use a feature branch workflow for development. Here's how to contribute:
+
+1. My main development branch is `dev`. Always create your feature branches from `dev`.
+
+2. Create a new branch using the following naming convention:
+
+   ```bash
+   git checkout -b Name/description-of-feature
+   ```
+
+   Example: `John/add-user-profile` or `Sarah/fix-auth-redirect`
+
+3. Make your changes and commit them with clear, descriptive messages.
+
+4. Push your feature branch and create a Pull Request (PR) against the `dev` branch.
+
+5. After review and approval, your PR will be merged into `dev`.
+
+Note: Direct commits to `dev` or `main` branches are not allowed. All changes must go through the PR process.
