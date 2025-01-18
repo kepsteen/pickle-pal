@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 if (process.env.NODE_ENV === "production") {
 	dotenv.config({ path: "/etc/app.env" });
 } else {
-	dotenv.config(); // Uses local .env file in development
+	dotenv.config();
 }
 
 export const connectDB = async () => {

@@ -1,21 +1,24 @@
-import { Card, CardContent, CardTitle } from "../components/Card/Card";
-import { Input } from "../components/Input/Input";
-import Label from "../components/Label/Label";
-import { ProfileImgInput } from "../components/ProfileImgInput/ProfileImgInput";
-import { Select } from "../components/Select/Select";
-import Button from "../components/Button/Button";
-import { cn } from "../lib/utils";
+import { Card, CardContent, CardTitle } from "../../components/Card/Card";
+import { Input } from "../../components/Input/Input";
+import Label from "../../components/Label/Label";
+import { ProfileImgInput } from "../../components/ProfileImgInput/ProfileImgInput";
+import { Select } from "../../components/Select/Select";
+import Button from "../../components/Button/Button";
+import { cn } from "../../lib/utils";
 import { useForm } from "react-hook-form";
-import { ProfileFormData } from "../types/profileSchema";
+import { ProfileFormData } from "../../types/profileSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { profileSchema } from "../types/profileSchema";
-import { DUPRRangeInput } from "../components/DUPRRangeInput/DUPRRangeInput";
+import { profileSchema } from "../../types/profileSchema";
+import { DUPRRangeInput } from "../../components/DUPRRangeInput/DUPRRangeInput";
+import { useAuth } from "@clerk/clerk-react";
 
 type OnboardingPageProps = {
 	isEditing: boolean;
 };
 
 export default function OnboardingPage({ isEditing }: OnboardingPageProps) {
+	const { userId: clerkId } = useAuth();
+
 	const {
 		register,
 		handleSubmit,
@@ -25,8 +28,24 @@ export default function OnboardingPage({ isEditing }: OnboardingPageProps) {
 		resolver: zodResolver(profileSchema),
 	});
 
-	function onSubmit(data: ProfileFormData) {
-		console.log("data", data);
+	async function onSubmit(data: ProfileFormData) {
+		try {
+			console.log("data", data);
+			const response = await fetch(`/api/users/${clerkId}`, {
+				method: "PATCH",
+				headers: {
+					"Content-type": "multipart/form-data",
+				},
+				body: JSON.stringify(data),
+			});
+			if (!response.ok) {
+				throw new Error(`HTTP error: ${response.status}`);
+			}
+			const result = await response.json();
+			console.log("result", result);
+		} catch (error) {
+			console.error(error);
+		}
 	}
 
 	return (

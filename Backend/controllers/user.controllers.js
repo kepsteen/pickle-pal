@@ -25,3 +25,11 @@ export const verifyEmailExists = async (req, res) => {
 		res.status(500).json({ error: "Error checking email existence" });
 	}
 };
+
+export const updateProfile = async (req, res) => {
+	try {
+		const { clerkId } = req.params;
+
+		console.log("req.body", req.body);
+	} catch (error) {}
+};
