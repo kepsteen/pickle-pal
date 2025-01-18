@@ -126,6 +126,7 @@ npm run dev
 2. Complete the user model in `/Backend/models/user.model.js`. The data collected in the onboarding form `/Frontend/pages/Onboarding/OnboardingPage.tsx`should be reflected in the model
 
 3. Create the markup for the [Home page](https://www.figma.com/design/eTfZdHbhLsu0nSbBbhJQuv/Pickle-Pal?node-id=5-2&t=NkHUOe3wq25Bh5PB-4).
+   - Create A layout component for routes nested in home
    - Use daisyui and tailwind for the semantic colors (primary, secondary etc) and components
    - Create a custom component for card
    - Use some hard-coded data to fill in the card like in the figma file
