@@ -4,7 +4,7 @@ import AuthLayout from "./layouts/AuthLayout";
 import LoginPage from "./pages/Auth/LoginPage";
 import SignUpPage from "./pages/Auth/SignUpPage";
 import HomePage from "./pages/Home/HomePage";
-import OnboardingPage from "./pages/OnboardingPage";
+import OnboardingPage from "./pages/Onboarding/OnboardingPage.tsx";
 
 function App() {
 	return (
