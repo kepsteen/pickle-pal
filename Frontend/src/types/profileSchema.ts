@@ -11,7 +11,7 @@ export const profileSchema = z.object({
 		drilling: z.boolean(),
 	}),
 	duprRating: z.coerce.number().min(2.0).max(7.0),
-	bio: z.string().max(500).optional(),
+	bio: z.string().min(1, "Bio is required").max(500),
 	profileImage: z.instanceof(FileList),
 });
 
