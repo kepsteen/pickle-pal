@@ -28,7 +28,6 @@ export default function OnboardingPage({ isEditing }: OnboardingPageProps) {
 	const {
 		register,
 		handleSubmit,
-		getValues,
 		formState: { errors },
 	} = useForm<ProfileFormData>({
 		resolver: zodResolver(profileSchema),
