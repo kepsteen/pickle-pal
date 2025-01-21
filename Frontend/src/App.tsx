@@ -16,7 +16,7 @@ function App() {
 						<Route path="login" element={<LoginPage />} />
 						<Route path="register" element={<SignUpPage />} />
 						<Route
-							path="/onboarding"
+							path="onboarding"
 							element={<OnboardingPage isEditing={false} />}
 						/>
 					</Route>
