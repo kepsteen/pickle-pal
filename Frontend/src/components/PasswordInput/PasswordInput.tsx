@@ -33,6 +33,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
 				/>
 				<button
 					type="button"
+					tabIndex={-1}
 					onClick={() => setShowPassword(!showPassword)}
 					className="absolute -translate-y-1/2 right-3 top-1/2"
 				>

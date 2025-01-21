@@ -1,11 +1,11 @@
-import { S3Client } from "@aws-sdk/client-s3";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import dotenv from "dotenv";
 
 // Load environment variables
 if (process.env.NODE_ENV === "production") {
 	dotenv.config({ path: "/etc/app.env" });
 } else {
-	dotenv.config();
+	dotenv.config({ path: "../.env" });
 }
 
 // Configure and export S3 Client
@@ -17,12 +17,13 @@ export const s3Client = new S3Client({
 	region: process.env.AWS_REGION,
 });
 
-// Optional: Create helper functions for common S3 operations
-export const uploadToS3 = async (fileBuffer, fileName) => {
+// s3 File upload helper function
+export const uploadToS3 = async (fileBuffer, fileName, userId) => {
 	const params = {
 		Bucket: process.env.AWS_BUCKET_NAME,
 		Key: fileName,
 		Body: fileBuffer,
+		ContentType: "image/*",
 	};
 
 	try {
