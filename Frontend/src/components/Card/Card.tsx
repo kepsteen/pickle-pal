@@ -23,9 +23,9 @@ export const CardDescription = ({ children, className }: CardProps) => {
 };
 
 export const CardContent = ({ children, className }: CardProps) => {
-	return <div className={cn("card-body", className)}>{children}</div>;
+	return <div className={cn("card-body ", className)}>{children}</div>;
 };
 
 export const Card = ({ children, className }: CardProps) => {
-	return <div className={cn("card", className)}>{children}</div>;
+	return <div className={cn("card ", className)}>{children}</div>;
 };
