@@ -25,7 +25,7 @@ export default function AuthLayout() {
 					</ul>
 				</nav>
 			</header>
-			<main className="min-h-[calc(100vh-80px)] grid place-content-center">
+			<main className="grid min-h-main-content place-content-center">
 				<Outlet />
 			</main>
 		</>
