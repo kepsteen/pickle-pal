@@ -11,13 +11,19 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { profileSchema } from "../../types/profileSchema";
 import { DUPRRangeInput } from "../../components/DUPRRangeInput/DUPRRangeInput";
 import { useAuth } from "@clerk/clerk-react";
+import { useState } from "react";
+import { useNavigate } from "react-router";
 
 type OnboardingPageProps = {
 	isEditing: boolean;
 };
 
 export default function OnboardingPage({ isEditing }: OnboardingPageProps) {
+	const [selectedImage, setSelectedImage] = useState("");
+
 	const { userId: clerkId } = useAuth();
+
+	const navigate = useNavigate();
 
 	const {
 		register,
@@ -30,19 +36,32 @@ export default function OnboardingPage({ isEditing }: OnboardingPageProps) {
 
 	async function onSubmit(data: ProfileFormData) {
 		try {
-			console.log("data", data);
+			const formData = new FormData();
+
+			// Append the file if it exists
+			if (data.profileImage?.[0]) {
+				formData.append("profileImage", data.profileImage[0]);
+			}
+
+			// Append other form fields
+			formData.append("firstName", data.firstName);
+			formData.append("skillLevel", data.skillLevel);
+			formData.append("playStyle", data.playStyle);
+			formData.append("duprRating", data.duprRating.toString());
+			formData.append("bio", data.bio);
+
+			// Convert lookingFor object to string
+			formData.append("lookingFor", JSON.stringify(data.lookingFor));
+
 			const response = await fetch(`/api/users/${clerkId}`, {
 				method: "PATCH",
-				headers: {
-					"Content-type": "multipart/form-data",
-				},
-				body: JSON.stringify(data),
+				body: formData,
 			});
+
 			if (!response.ok) {
 				throw new Error(`HTTP error: ${response.status}`);
 			}
-			const result = await response.json();
-			console.log("result", result);
+			navigate("/home");
 		} catch (error) {
 			console.error(error);
 		}
@@ -64,6 +83,11 @@ export default function OnboardingPage({ isEditing }: OnboardingPageProps) {
 							<ProfileImgInput
 								{...register("profileImage")}
 								name="profileImage"
+								onChange={(e) => {
+									const file = e.target.files?.[0];
+									setSelectedImage(file ? URL.createObjectURL(file) : "");
+								}}
+								preview={selectedImage}
 							/>
 							<span className="text-error">{errors.profileImage?.message}</span>
 						</Label>
