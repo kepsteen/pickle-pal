@@ -2,8 +2,8 @@ import { z } from "zod";
 
 export const profileSchema = z.object({
 	firstName: z.string().min(1, "Name is required"),
-	skillLevel: z.enum(["beginner", "intermediate", "Advanced"]),
-	playStyle: z.enum(["dinker", "hybrid", "banger"]),
+	skillLevel: z.enum(["Beginner", "Intermediate", "Advanced"]),
+	playStyle: z.enum(["Dinker", "Hybrid", "Banger"]),
 	lookingFor: z.object({
 		competitive: z.coerce.boolean(),
 		casual: z.coerce.boolean(),
@@ -15,6 +15,8 @@ export const profileSchema = z.object({
 	profileImage: z.instanceof(FileList).refine((files) => files.length > 0, {
 		message: "Profile image is required",
 	}),
+	profileImageUrl: z.string().optional(),
 });
 
 export type ProfileFormData = z.infer<typeof profileSchema>;
+export type ProfileData = Omit<ProfileFormData, "profileImage">;

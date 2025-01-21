@@ -3,8 +3,9 @@ import LandingPage from "./pages/LandingPage";
 import AuthLayout from "./layouts/AuthLayout";
 import LoginPage from "./pages/Auth/LoginPage";
 import SignUpPage from "./pages/Auth/SignUpPage";
-import HomePage from "./pages/Home/HomePage";
 import OnboardingPage from "./pages/Onboarding/OnboardingPage.tsx";
+import HomeLayout from "./layouts/HomeLayout.tsx";
+import HomePage from "./pages/Home/HomePage.tsx";
 
 function App() {
 	return (
@@ -20,7 +21,11 @@ function App() {
 							element={<OnboardingPage isEditing={false} />}
 						/>
 					</Route>
-					<Route path="/home" element={<HomePage />} />
+					<Route element={<HomeLayout />}>
+						<Route path="home" element={<HomePage />} />
+						{/* messages page */}
+						{/* map page */}
+					</Route>
 				</Route>
 			</Routes>
 		</>

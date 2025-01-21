@@ -4,7 +4,7 @@ import { NavLink } from "react-router";
 export default function GlobalHeader() {
 	return (
 		<header>
-			<nav className="p-4 ">
+			<nav className="p-4">
 				<ul className="flex justify-between items-center [&_svg]:w-8 [&_svg]:h-8 container-padding">
 					<li>
 						<NavLink to="" className="flex items-center gap-2">
@@ -15,11 +15,11 @@ export default function GlobalHeader() {
 									className="w-full h-full"
 								/>
 							</div>
-							<p className="hidden text-2xl font-bold sm:block">
+							<h2 className="hidden text-2xl font-bold sm:block">
 								<em>
 									<span className="text-primary">Pickle</span> Pal
 								</em>
-							</p>
+							</h2>
 						</NavLink>
 					</li>
 					<li className="[&_svg]:text-primary">
