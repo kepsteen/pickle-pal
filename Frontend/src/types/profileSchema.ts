@@ -12,7 +12,9 @@ export const profileSchema = z.object({
 	}),
 	duprRating: z.coerce.number().min(2.0).max(7.0),
 	bio: z.string().min(1, "Bio is required").max(500),
-	profileImage: z.instanceof(FileList),
+	profileImage: z.instanceof(FileList).refine((files) => files.length > 0, {
+		message: "Profile image is required",
+	}),
 });
 
 export type ProfileFormData = z.infer<typeof profileSchema>;
