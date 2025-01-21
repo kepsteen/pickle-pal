@@ -43,7 +43,7 @@ export const ProfileImgInput = forwardRef<
 					props.onChange?.(e);
 				}}
 			/>
-			<div className="absolute inset-0 grid border cursor-pointer place-content-center bg-base-300 rounded-box border-accent">
+			<div className="absolute inset-0 grid object-cover overflow-hidden border cursor-pointer place-content-center bg-base-300 rounded-box border-accent">
 				{preview ? (
 					<img
 						src={preview}
