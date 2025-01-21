@@ -193,17 +193,6 @@ export default function OnboardingPage({ isEditing }: OnboardingPageProps) {
 							<Button>{isEditing ? "Update Profile" : "Create Profile"}</Button>
 						</div>
 					</form>
-					<button
-						onClick={() => {
-							console.log("Current form values:", getValues());
-							console.log(
-								"Specific profileImage value:",
-								getValues("profileImage")
-							);
-						}}
-					>
-						get values
-					</button>
 				</CardContent>
 			</Card>
 		</>
