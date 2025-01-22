@@ -5,7 +5,7 @@ export default function HomeLayout() {
 	return (
 		<>
 			<GlobalHeader />
-			<main className="flex flex-col items-center justify-center min-h-main-content container-padding">
+			<main className="grid place-content-center min-h-main-content container-padding">
 				<Outlet />
 			</main>
 		</>

@@ -6,7 +6,7 @@ const userSchema = mongoose.Schema(
 		firstName: { type: String, required: true },
 		userId: { type: String, required: true },
 		skillLevel: { type: String },
-		playstyle: { type: String },
+		playStyle: { type: String },
 		duprRating: { type: Number, min: 2, max: 8 },
 		bio: { type: String },
 		lookingFor: [{ type: String }],

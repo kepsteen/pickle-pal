@@ -36,6 +36,13 @@ export default function OnboardingPage({ isEditing }: OnboardingPageProps) {
 		formState: { errors },
 	} = useForm<ProfileFormData>({
 		resolver: zodResolver(profileSchema),
+		defaultValues: {
+			firstName: "",
+			skillLevel: "Beginner",
+			playStyle: "Hybrid",
+			duprRating: 2,
+			bio: "",
+		},
 	});
 
 	async function onSubmit(data: ProfileFormData) {
@@ -147,7 +154,7 @@ export default function OnboardingPage({ isEditing }: OnboardingPageProps) {
 									<input
 										{...register("lookingFor.casual")}
 										type="checkbox"
-										value="true"
+										id="casual-checkbox"
 										className="checkbox checkbox-primary border-accent"
 									/>
 									<span>Casual Games</span>
@@ -156,7 +163,7 @@ export default function OnboardingPage({ isEditing }: OnboardingPageProps) {
 									<input
 										{...register("lookingFor.competitive")}
 										type="checkbox"
-										value="true"
+										id="competitive-checkbox"
 										className="checkbox checkbox-primary border-accent"
 									/>
 									<span>Competitive</span>
@@ -165,7 +172,7 @@ export default function OnboardingPage({ isEditing }: OnboardingPageProps) {
 									<input
 										{...register("lookingFor.friends")}
 										type="checkbox"
-										value="true"
+										id="friends-checkbox"
 										className="checkbox checkbox-primary border-accent"
 									/>
 									<span>Friends</span>
@@ -174,7 +181,7 @@ export default function OnboardingPage({ isEditing }: OnboardingPageProps) {
 									<input
 										{...register("lookingFor.drilling")}
 										type="checkbox"
-										value="true"
+										id="drilling-checkbox"
 										className="checkbox checkbox-primary border-accent"
 									/>
 									<span>Drilling</span>

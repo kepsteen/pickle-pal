@@ -11,11 +11,9 @@ if (process.env.NODE_ENV === "production") {
 
 export const createUser = async (req, res) => {
 	try {
-		console.log("createUser endpoint hit", req.body);
 		const { email, firstName, userId } = req.body;
 
 		const newProfile = await User.create({ email, firstName, userId });
-		console.log("Profile created:", newProfile);
 		res.status(201).json(newProfile);
 	} catch (error) {
 		console.error("Create user error:", error);
@@ -47,7 +45,6 @@ export const updateProfile = async (req, res) => {
 		const profileImage = req.file;
 		const { firstName, skillLevel, playStyle, duprRating, bio, lookingFor } =
 			req.body;
-
 		if (!profileImage) {
 			return res.status(400).json({ error: "Profile image is required" });
 		}
@@ -66,7 +63,7 @@ export const updateProfile = async (req, res) => {
 			playStyle,
 			duprRating,
 			bio,
-			lookingFor,
+			lookingFor: JSON.parse(lookingFor),
 			profileImageUrl: `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${imageName}`,
 		};
 
@@ -87,10 +84,9 @@ export const updateProfile = async (req, res) => {
 
 export const getUsers = async (req, res) => {
 	try {
-		console.log("endpoint hit");
-		const { currentUserId } = req.query;
+		const { excludeUserId } = req.query;
 
-		const users = await User.find({ userId: { $ne: currentUserId } });
+		const users = await User.find({ userId: { $ne: excludeUserId } });
 
 		if (users.length === 0) res.status(404).json({ error: "No users found" });
 

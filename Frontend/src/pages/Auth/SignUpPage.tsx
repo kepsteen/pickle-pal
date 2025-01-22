@@ -62,7 +62,6 @@ export default function SignUpPage() {
 			});
 
 			if (!response.ok) throw new Error(`Response status: ${response.status}`);
-			console.log("response was ok");
 			navigate("/onboarding");
 		} catch (error) {
 			console.error("Error signing up", error);
