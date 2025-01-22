@@ -11,7 +11,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { profileSchema } from "../../types/profileSchema";
 import { DUPRRangeInput } from "../../components/DUPRRangeInput/DUPRRangeInput";
 import { useAuth } from "@clerk/clerk-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 
 type OnboardingPageProps = {
@@ -20,10 +20,15 @@ type OnboardingPageProps = {
 
 export default function OnboardingPage({ isEditing }: OnboardingPageProps) {
 	const [selectedImage, setSelectedImage] = useState("");
-
-	const { userId: clerkId } = useAuth();
-
+	const [isLoading, setIsLoading] = useState(true);
+	const { userId: clerkId, isLoaded } = useAuth();
 	const navigate = useNavigate();
+
+	useEffect(() => {
+		if (isLoaded) {
+			setIsLoading(false);
+		}
+	}, [clerkId, isLoaded]);
 
 	const {
 		register,
@@ -31,6 +36,13 @@ export default function OnboardingPage({ isEditing }: OnboardingPageProps) {
 		formState: { errors },
 	} = useForm<ProfileFormData>({
 		resolver: zodResolver(profileSchema),
+		defaultValues: {
+			firstName: "",
+			skillLevel: "Beginner",
+			playStyle: "Hybrid",
+			duprRating: 2,
+			bio: "",
+		},
 	});
 
 	async function onSubmit(data: ProfileFormData) {
@@ -42,15 +54,19 @@ export default function OnboardingPage({ isEditing }: OnboardingPageProps) {
 				formData.append("profileImage", data.profileImage[0]);
 			}
 
+			// Transform lookingFor object into array
+			const lookingForArray = Object.entries(data.lookingFor)
+				// eslint-disable-next-line @typescript-eslint/no-unused-vars
+				.filter(([_, checked]) => checked)
+				.map(([key]) => key);
+
 			// Append other form fields
 			formData.append("firstName", data.firstName);
 			formData.append("skillLevel", data.skillLevel);
 			formData.append("playStyle", data.playStyle);
 			formData.append("duprRating", data.duprRating.toString());
 			formData.append("bio", data.bio);
-
-			// Convert lookingFor object to string
-			formData.append("lookingFor", JSON.stringify(data.lookingFor));
+			formData.append("lookingFor", JSON.stringify(lookingForArray));
 
 			const response = await fetch(`/api/users/${clerkId}`, {
 				method: "PATCH",
@@ -64,6 +80,10 @@ export default function OnboardingPage({ isEditing }: OnboardingPageProps) {
 		} catch (error) {
 			console.error(error);
 		}
+	}
+
+	if (isLoading) {
+		return <div>Loading...</div>; // Or your preferred loading component
 	}
 
 	return (
@@ -107,8 +127,8 @@ export default function OnboardingPage({ isEditing }: OnboardingPageProps) {
 								className="text-base-content/60"
 								variant="accent"
 							>
-								<option value="beginner">Beginner</option>
-								<option value="intermediate">Intermediate</option>
+								<option value="Beginner">Beginner</option>
+								<option value="Intermediate">Intermediate</option>
 								<option value="Advanced">Advanced</option>
 							</Select>
 							<span className="text-error">{errors.skillLevel?.message}</span>
@@ -121,9 +141,9 @@ export default function OnboardingPage({ isEditing }: OnboardingPageProps) {
 								className="text-base-content/60"
 								variant="accent"
 							>
-								<option value="dinker">Dinker</option>
-								<option value="hybrid">Hybrid</option>
-								<option value="banger">Banger</option>
+								<option value="Dinker">Dinker</option>
+								<option value="Hybrid">Hybrid</option>
+								<option value="Banger">Banger</option>
 							</Select>
 							<span className="text-error">{errors.playStyle?.message}</span>
 						</Label>
@@ -134,7 +154,7 @@ export default function OnboardingPage({ isEditing }: OnboardingPageProps) {
 									<input
 										{...register("lookingFor.casual")}
 										type="checkbox"
-										value="true"
+										id="casual-checkbox"
 										className="checkbox checkbox-primary border-accent"
 									/>
 									<span>Casual Games</span>
@@ -143,7 +163,7 @@ export default function OnboardingPage({ isEditing }: OnboardingPageProps) {
 									<input
 										{...register("lookingFor.competitive")}
 										type="checkbox"
-										value="true"
+										id="competitive-checkbox"
 										className="checkbox checkbox-primary border-accent"
 									/>
 									<span>Competitive</span>
@@ -152,7 +172,7 @@ export default function OnboardingPage({ isEditing }: OnboardingPageProps) {
 									<input
 										{...register("lookingFor.friends")}
 										type="checkbox"
-										value="true"
+										id="friends-checkbox"
 										className="checkbox checkbox-primary border-accent"
 									/>
 									<span>Friends</span>
@@ -161,7 +181,7 @@ export default function OnboardingPage({ isEditing }: OnboardingPageProps) {
 									<input
 										{...register("lookingFor.drilling")}
 										type="checkbox"
-										value="true"
+										id="drilling-checkbox"
 										className="checkbox checkbox-primary border-accent"
 									/>
 									<span>Drilling</span>

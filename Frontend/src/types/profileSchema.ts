@@ -10,7 +10,10 @@ export const profileSchema = z.object({
 		friends: z.boolean(),
 		drilling: z.boolean(),
 	}),
-	duprRating: z.coerce.number().min(2.0).max(7.0),
+	duprRating: z.coerce
+		.number()
+		.min(2.0, "DUPR Rating must be between 2 and 8")
+		.max(8.0, "DUPR Rating must be between 2 and 8"),
 	bio: z.string().min(1, "Bio is required").max(500),
 	profileImage: z.instanceof(FileList).refine((files) => files.length > 0, {
 		message: "Profile image is required",
@@ -19,4 +22,13 @@ export const profileSchema = z.object({
 });
 
 export type ProfileFormData = z.infer<typeof profileSchema>;
-export type ProfileData = Omit<ProfileFormData, "profileImage">;
+
+export type ProfileData = {
+	firstName: string;
+	skillLevel: "Beginner" | "Intermediate" | "Advanced";
+	playStyle: "Dinker" | "Hybrid" | "Banger";
+	lookingFor: [string];
+	duprRating: number;
+	bio: string;
+	profileImageUrl: string;
+};

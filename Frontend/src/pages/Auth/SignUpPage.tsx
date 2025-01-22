@@ -43,10 +43,12 @@ export default function SignUpPage() {
 	async function onSubmit(data: SignUpFormData) {
 		setIsPending(true);
 		try {
-			await signUp?.create({
+			const clerkResponse = await signUp?.create({
 				emailAddress: data.email,
 				password: data.password,
 			});
+			signUp?.reload();
+
 			const response = await fetch(`/api/users`, {
 				method: "POST",
 				headers: {
@@ -55,6 +57,7 @@ export default function SignUpPage() {
 				body: JSON.stringify({
 					firstName: data.firstName,
 					email: data.email,
+					userId: clerkResponse?.createdUserId,
 				}),
 			});
 
