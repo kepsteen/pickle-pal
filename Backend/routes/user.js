@@ -1,8 +1,9 @@
 import express from "express";
 import {
-	createInitialProfile,
+	createUser,
 	verifyEmailExists,
 	updateProfile,
+	getUsers,
 } from "../controllers/user.controllers.js";
 import multer from "multer";
 
@@ -25,8 +26,15 @@ const upload = multer({
 });
 
 // Create Profile
-router.post("/", createInitialProfile);
-router.get("/:email", verifyEmailExists);
+router.post("/", createUser);
+
+// Verify email is unique
+router.get("/verify/:email", verifyEmailExists);
+
+// Update Profile
 router.patch("/:userId", upload.single("profileImage"), updateProfile);
+
+//
+router.get("/all", getUsers);
 
 export const usersRouter = router;

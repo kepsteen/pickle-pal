@@ -1,5 +1,5 @@
 import { formatUserImageName } from "../lib/utils.js";
-import { InitialProfile } from "../models/profile.model.js";
+import { User } from "../models/profile.model.js";
 import { uploadToS3 } from "../s3/client.js";
 import dotenv from "dotenv";
 
@@ -9,14 +9,20 @@ if (process.env.NODE_ENV === "production") {
 	dotenv.config({ path: "../.env" });
 }
 
-export const createInitialProfile = async (req, res) => {
+export const createUser = async (req, res) => {
 	try {
-		const { email, firstName } = req.body;
-		// Todo: Add error handling
-		const newProfile = await InitialProfile.create({ email, firstName });
+		console.log("createUser endpoint hit", req.body);
+		const { email, firstName, userId } = req.body;
+
+		const newProfile = await User.create({ email, firstName, userId });
+		console.log("Profile created:", newProfile);
 		res.status(201).json(newProfile);
 	} catch (error) {
-		res.status(500).json({ error: "Failed to create profile" });
+		console.error("Create user error:", error);
+		res.status(500).json({
+			error: "Failed to create profile",
+			details: error.message,
+		});
 	}
 };
 
@@ -24,7 +30,7 @@ export const verifyEmailExists = async (req, res) => {
 	try {
 		const { email } = req.params;
 		if (email === undefined) throw new Error("Email is required");
-		const profile = await InitialProfile.find({ email });
+		const profile = await User.find({ email });
 		if (profile.length !== 0) {
 			return res.status(200).json({ uniqueEmail: false });
 		}
@@ -64,11 +70,9 @@ export const updateProfile = async (req, res) => {
 			profileImageUrl: `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${imageName}`,
 		};
 
-		const updatedProfile = await InitialProfile.findOneAndUpdate(
-			{ userId },
-			updateData,
-			{ new: true }
-		);
+		const updatedProfile = await User.findOneAndUpdate({ userId }, updateData, {
+			new: true,
+		});
 
 		if (!updatedProfile) {
 			return res.status(404).json({ error: "Profile not found" });
@@ -78,5 +82,21 @@ export const updateProfile = async (req, res) => {
 	} catch (error) {
 		console.error("Profile update error:", error);
 		res.status(500).json({ error: "Error updating Profile" });
+	}
+};
+
+export const getUsers = async (req, res) => {
+	try {
+		console.log("endpoint hit");
+		const { currentUserId } = req.query;
+
+		const users = await User.find({ userId: { $ne: currentUserId } });
+
+		if (users.length === 0) res.status(404).json({ error: "No users found" });
+
+		return res.status(200).json(users);
+	} catch (error) {
+		console.error("Error finding users", error);
+		res.status(500).json({ error: "Error fetching users" });
 	}
 };

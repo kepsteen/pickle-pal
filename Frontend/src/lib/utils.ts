@@ -8,7 +8,9 @@ export const cn = (...inputs: (string | undefined)[]) => twMerge(clsx(inputs));
 export function checkEmailToBeUnique(): RefinementCallback<SignUpFormData> {
 	return async (data, { signal }) => {
 		try {
-			const response = await fetch(`/api/users/${data.email}`, { signal });
+			const response = await fetch(`/api/users/verify/${data.email}`, {
+				signal,
+			});
 
 			if (!response.ok) throw new Error("Error verifying email");
 			const { uniqueEmail } = await response.json();

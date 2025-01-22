@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const initialProfileSchema = mongoose.Schema(
+const userSchema = mongoose.Schema(
 	{
 		email: { type: String, required: true },
 		firstName: { type: String, required: true },
@@ -9,24 +9,7 @@ const initialProfileSchema = mongoose.Schema(
 		playstyle: { type: String },
 		duprRating: { type: Number, min: 2, max: 8 },
 		bio: { type: String },
-		lookingFor: {
-			casual: {
-				type: Boolean,
-				default: false,
-			},
-			competitive: {
-				type: Boolean,
-				default: false,
-			},
-			friends: {
-				type: Boolean,
-				default: false,
-			},
-			drilling: {
-				type: Boolean,
-				default: false,
-			},
-		},
+		lookingFor: [{ type: String }],
 		profileImageUrl: { type: String },
 	},
 	{
@@ -34,5 +17,5 @@ const initialProfileSchema = mongoose.Schema(
 	}
 );
 
-const InitialProfile = mongoose.model("InitialUser", initialProfileSchema);
-export { InitialProfile };
+const User = mongoose.model("InitialUser", userSchema);
+export { User };
