@@ -5,8 +5,11 @@ const userSchema = mongoose.Schema(
 		email: { type: String, required: true },
 		firstName: { type: String, required: true },
 		userId: { type: String, required: true },
-		skillLevel: { type: String },
-		playStyle: { type: String },
+		skillLevel: {
+			type: String,
+			enum: ["Beginner", "Intermediate", "Advanced"],
+		},
+		playStyle: { type: String, enum: ["Dinker", "Hybrid", "Banger"] },
 		duprRating: { type: Number, min: 2, max: 8 },
 		bio: { type: String },
 		lookingFor: [{ type: String }],
