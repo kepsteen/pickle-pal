@@ -12,6 +12,7 @@ const likesSchema = mongoose.Schema(
 			ref: "User",
 			required: true,
 		},
+		isLike: { type: Boolean },
 		timestamp: { type: Date, default: Date.now },
 	},
 	{
@@ -72,6 +73,7 @@ const pairLikesSchema = mongoose.Schema(
 			ref: "Pair",
 			required: true,
 		},
+		isLike: { type: Boolean },
 		timestamp: { type: Date, default: Date.now },
 	},
 	{
