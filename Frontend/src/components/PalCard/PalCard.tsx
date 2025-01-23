@@ -57,7 +57,7 @@ export default function PalCard({
 						<h1 className="text-3xl font-semibold">{profile.firstName}</h1>
 						<Badge
 							variant={getSkillLevelBadgeVariant(profile.skillLevel)}
-							size="lgmm"
+							size="lg"
 						>
 							{profile.skillLevel}
 						</Badge>
