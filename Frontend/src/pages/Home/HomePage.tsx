@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { AnimatePresence } from "framer-motion";
 import PalCard from "../../components/PalCard/PalCard";
 import SwipeButton from "../../components/SwipeButton/SwipeButton";
 import { ProfileData } from "../../types/profileSchema";
@@ -8,6 +9,9 @@ import { useState } from "react";
 export default function HomePage() {
 	const [profiles, setProfiles] = useState<ProfileData[]>([]);
 	const [index, setIndex] = useState(5);
+	const [swipeDirection, setSwipeDirection] = useState<"left" | "right" | null>(
+		null
+	);
 	const query = useQuery({
 		queryKey: ["profiles"],
 		queryFn: async () => {
@@ -21,24 +25,30 @@ export default function HomePage() {
 	if (query.isError)
 		return <div>{`Error loading profiles: ${query.error}`}</div>;
 
+	const handleSwipe = (direction: "left" | "right") => {
+		setSwipeDirection(direction);
+		setTimeout(() => {
+			setIndex((prev) => prev + (direction === "right" ? 1 : -1));
+			setSwipeDirection(null);
+		}, 100);
+	};
+
 	return (
 		<>
 			<div className="grid place-content-center">
-				<PalCard profile={profiles[index]} />
+				<AnimatePresence mode="wait">
+					{profiles[index] && (
+						<PalCard
+							key={index}
+							profile={profiles[index]}
+							swipeDirection={swipeDirection}
+						/>
+					)}
+				</AnimatePresence>
 			</div>
 			<div className="flex justify-center gap-8 mt-8">
-				<SwipeButton
-					variant="dislike"
-					onClick={() => {
-						setIndex((prev) => prev - 1);
-					}}
-				/>
-				<SwipeButton
-					variant="like"
-					onClick={() => {
-						setIndex((prev) => prev + 1);
-					}}
-				/>
+				<SwipeButton variant="dislike" onClick={() => handleSwipe("left")} />
+				<SwipeButton variant="like" onClick={() => handleSwipe("right")} />
 			</div>
 		</>
 	);
