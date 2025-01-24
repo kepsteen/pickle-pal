@@ -12,7 +12,7 @@ import { NavLink, useNavigate } from "react-router";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { cn } from "../../lib/utils";
-import { Eye, EyeOff } from "lucide-react";
+import { PasswordInput } from "../../components/PasswordInput/PasswordInput";
 
 type LoginFormData = {
 	email: string;
@@ -21,7 +21,6 @@ type LoginFormData = {
 
 export default function LoginPage() {
 	const [isPending, setIsPending] = useState(false);
-	const [showPassword, setShowPassword] = useState(false);
 
 	const navigate = useNavigate();
 
@@ -44,7 +43,7 @@ export default function LoginPage() {
 			});
 
 			if (signInResult?.status === "complete") {
-				// Get the Clerk singleton to call setActive
+				// Need to set the active session so isSigned -> true
 				await setActive({
 					session: signInResult.createdSessionId,
 				});
@@ -66,7 +65,7 @@ export default function LoginPage() {
 				</CardDescription>
 				<CardContent>
 					<form
-						className="flex flex-col gap-4"
+						className="flex flex-col gap-4 font-extrabold"
 						onSubmit={handleSubmit(onSubmit)}
 					>
 						<Label className="p-0">
@@ -84,20 +83,12 @@ export default function LoginPage() {
 						</Label>
 						<Label className="relative p-0">
 							<span className="sr-only">Password</span>
-							<Input
+							<PasswordInput
 								{...register("password")}
-								type={showPassword ? "password" : "text"}
 								name="password"
 								placeholder="Password"
 								className={errors.password && "input-error"}
 							/>
-							<button onClick={() => setShowPassword(showPassword)}>
-								{showPassword ? (
-									<EyeOff className="absolute right-3 top-1 text-base-content/60" />
-								) : (
-									<Eye className="absolute right-3 top-1 text-base-content/60" />
-								)}
-							</button>
 							{errors.password && (
 								<span className="text-error">{errors.password.message}</span>
 							)}
