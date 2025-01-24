@@ -1,25 +1,10 @@
+import { createContext, ReactNode, useContext } from "react";
 import {
-	createContext,
-	ReactNode,
-	useContext,
-	useEffect,
-	useState,
-} from "react";
-import {
-	useSignIn,
 	useAuth as useClerkAuth,
 	useSession,
-	useSignUp,
 	useUser,
 } from "@clerk/clerk-react";
-import {
-	ActiveSessionResource,
-	GetToken,
-	SessionResource,
-	SignInResource,
-	SignUpResource,
-	UserResource,
-} from "@clerk/types";
+import { ActiveSessionResource, UserResource } from "@clerk/types";
 
 // First, let's type what our context will contain
 type AuthContextType = {
@@ -37,9 +22,7 @@ type AuthContextProviderProps = {
 	children: ReactNode;
 };
 
-export default function AuthContextProvider({
-	children,
-}: AuthContextProviderProps) {
+export function AuthContextProvider({ children }: AuthContextProviderProps) {
 	const { isLoaded, isSignedIn } = useClerkAuth();
 	const { user } = useUser();
 	const { session } = useSession();
