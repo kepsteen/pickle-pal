@@ -6,6 +6,7 @@ import cors from "cors";
 import { connectDB } from "./db/connect.js";
 import path from "path";
 import { fileURLToPath } from "url";
+import { clerkMiddleware, requireAuth } from "@clerk/express";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -18,6 +19,13 @@ app.use(cors());
 
 app.use(express.json());
 
+app.use(
+	clerkMiddleware({
+		secretKey: process.env.CLERK_SECRET_KEY,
+		publishableKey: process.env.CLERK_PUBLISHABLE_KEY,
+	})
+);
+
 // Serve static files from the Frontend/dist directory
 app.use(express.static(path.join(__dirname, "../Frontend/dist")));
 
@@ -29,6 +37,16 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/users", usersRouter);
+
+app.get("/api/messages", requireAuth(), async (req, res) => {
+	try {
+		const { userId } = req.auth;
+		console.log("userId", userId);
+		res.status(200).json(userId);
+	} catch (error) {
+		res.status(500).json({ error: "Internal Server Error" });
+	}
+});
 
 // Serve index.html for all other routes (for client-side routing)
 app.get("*", (req, res) => {
