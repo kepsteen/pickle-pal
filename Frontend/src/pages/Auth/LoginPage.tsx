@@ -1,4 +1,4 @@
-import { useSignIn } from "@clerk/clerk-react";
+import { useClerk, useSignIn } from "@clerk/clerk-react";
 import {
 	Card,
 	CardContent,
@@ -8,11 +8,11 @@ import {
 import Label from "../../components/Label/Label";
 import { Input } from "../../components/Input/Input";
 import Button from "../../components/Button/Button";
-import { NavLink } from "react-router";
+import { NavLink, useNavigate } from "react-router";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { cn } from "../../lib/utils";
-import { Eye, EyeOff } from "lucide-react";
+import { PasswordInput } from "../../components/PasswordInput/PasswordInput";
 
 type LoginFormData = {
 	email: string;
@@ -21,7 +21,8 @@ type LoginFormData = {
 
 export default function LoginPage() {
 	const [isPending, setIsPending] = useState(false);
-	const [showPassword, setShowPassword] = useState(false);
+
+	const navigate = useNavigate();
 
 	const { signIn } = useSignIn();
 	const {
@@ -30,17 +31,26 @@ export default function LoginPage() {
 		formState: { errors },
 	} = useForm<LoginFormData>();
 
+	const { setActive } = useClerk();
+
 	async function onSubmit(data: LoginFormData) {
 		setIsPending(true);
 		try {
-			await signIn?.create({
+			const signInResult = await signIn?.create({
 				identifier: data.email,
 				strategy: "password",
 				password: data.password,
 			});
-			// Todo: Add Loading state
+
+			if (signInResult?.status === "complete") {
+				// Need to set the active session so isSigned -> true
+				await setActive({
+					session: signInResult.createdSessionId,
+				});
+				navigate("/home");
+			}
 		} catch (error) {
-			console.error("Error signing up", error);
+			console.error("Error signing in", error);
 		} finally {
 			setIsPending(false);
 		}
@@ -55,7 +65,7 @@ export default function LoginPage() {
 				</CardDescription>
 				<CardContent>
 					<form
-						className="flex flex-col gap-4"
+						className="flex flex-col gap-4 font-extrabold"
 						onSubmit={handleSubmit(onSubmit)}
 					>
 						<Label className="p-0">
@@ -73,20 +83,12 @@ export default function LoginPage() {
 						</Label>
 						<Label className="relative p-0">
 							<span className="sr-only">Password</span>
-							<Input
+							<PasswordInput
 								{...register("password")}
-								type={showPassword ? "password" : "text"}
 								name="password"
 								placeholder="Password"
 								className={errors.password && "input-error"}
 							/>
-							<button onClick={() => setShowPassword(!showPassword)}>
-								{showPassword ? (
-									<Eye className="absolute right-3 top-1 text-base-content/60" />
-								) : (
-									<EyeOff className="absolute right-3 top-1 text-base-content/60" />
-								)}
-							</button>
 							{errors.password && (
 								<span className="text-error">{errors.password.message}</span>
 							)}

@@ -18,7 +18,7 @@ const queryClient = new QueryClient();
 
 createRoot(document.getElementById("root")!).render(
 	<React.StrictMode>
-		<ClerkProvider publishableKey={PUBLISHABLE_KEY} afterSignOutUrl="/">
+		<ClerkProvider publishableKey={PUBLISHABLE_KEY} afterSignOutUrl="/login">
 			<BrowserRouter>
 				<QueryClientProvider client={queryClient}>
 					<App />
