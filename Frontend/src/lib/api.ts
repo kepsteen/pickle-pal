@@ -8,3 +8,7 @@ export async function getUsers(currentUserId: string) {
 	}
 	return (await response.json()) as [ProfileData];
 }
+
+export async function setLocation(coordinates: [number]) {
+	const response = await fetch("/api");
+}

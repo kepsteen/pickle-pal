@@ -5,6 +5,7 @@ import SwipeButton from "../../components/SwipeButton/SwipeButton";
 import { ProfileData } from "../../types/profileSchema";
 import { getUsers } from "../../lib/api";
 import { useState } from "react";
+import { SetLocation } from "../../components/SetLocation/SetLocation";
 
 export default function HomePage() {
 	const [profiles, setProfiles] = useState<ProfileData[]>([]);
@@ -12,6 +13,8 @@ export default function HomePage() {
 	const [swipeDirection, setSwipeDirection] = useState<"left" | "right" | null>(
 		null
 	);
+
+	// Fetch profiles
 	const query = useQuery({
 		queryKey: ["profiles"],
 		queryFn: async () => {
@@ -50,6 +53,7 @@ export default function HomePage() {
 				<SwipeButton variant="dislike" onClick={() => handleSwipe("left")} />
 				<SwipeButton variant="like" onClick={() => handleSwipe("right")} />
 			</div>
+			<SetLocation />
 		</>
 	);
 }
