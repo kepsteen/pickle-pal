@@ -21,7 +21,11 @@ function App() {
 						<Route path="register" element={<SignUpPage />} />
 						<Route
 							path="onboarding"
-							element={<OnboardingPage isEditing={false} />}
+							element={
+								<ProtectedRoute>
+									<OnboardingPage isEditing={false} />
+								</ProtectedRoute>
+							}
 						/>
 					</Route>
 					<Route
