@@ -1,7 +1,25 @@
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
+import { setLocation } from "../../lib/api";
+import { useAuth } from "@clerk/clerk-react";
 
-export const SetLocation = () => {
-	const [position, setPosition] = useState<GeolocationPosition | null>(null);
+type SetLocationProps = {
+	setPosition: (value: GeolocationPosition | null) => void;
+	position: GeolocationPosition | null;
+};
+
+export const SetLocation = ({ setPosition, position }: SetLocationProps) => {
+	const { getToken } = useAuth();
+
+	const query = useQuery({
+		queryKey: ["setLocation"],
+		queryFn: async () => {
+			const token = await getToken();
+			if (!position || !token) return null;
+			const data = await setLocation(position, token);
+			return data;
+		},
+	});
 
 	useEffect(() => {
 		if (position) {
@@ -10,10 +28,17 @@ export const SetLocation = () => {
 			};
 			console.log("pos", pos);
 		}
-	}, [position]);
+	}, [position, query]);
 
 	function handleGetLocation() {
 		navigator.geolocation.getCurrentPosition((pos) => setPosition(pos));
+		query.refetch();
 	}
-	return <button onClick={handleGetLocation}>Get location</button>;
+
+	return (
+		<>
+			<button onClick={handleGetLocation}>Get location</button>
+			<p>{JSON.stringify(query.data)}</p>
+		</>
+	);
 };

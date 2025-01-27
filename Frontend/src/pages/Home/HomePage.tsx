@@ -3,26 +3,39 @@ import { AnimatePresence } from "framer-motion";
 import PalCard from "../../components/PalCard/PalCard";
 import SwipeButton from "../../components/SwipeButton/SwipeButton";
 import { ProfileData } from "../../types/profileSchema";
-import { getUsers } from "../../lib/api";
-import { useState } from "react";
-import { SetLocation } from "../../components/SetLocation/SetLocation";
+import { getNearbyUsers } from "../../lib/api";
+import { useEffect, useState } from "react";
+import { SetLocation } from "../../components/SetLocation/SetLocation.tsx";
+import { useAuth } from "@clerk/clerk-react";
 
 export default function HomePage() {
-	const [profiles, setProfiles] = useState<ProfileData[]>([]);
+	const [profiles, setProfiles] = useState<ProfileData[] | undefined>([]);
 	const [index, setIndex] = useState(5);
 	const [swipeDirection, setSwipeDirection] = useState<"left" | "right" | null>(
 		null
 	);
+	const [position, setPosition] = useState<GeolocationPosition | null>(null);
+	const { getToken } = useAuth();
 
+	console.log("profiles", profiles);
 	// Fetch profiles
 	const query = useQuery({
-		queryKey: ["profiles"],
+		queryKey: ["nearbyProfiles", position, token],
 		queryFn: async () => {
-			const data = await getUsers("user_2rgLaUCcJmigG45v2SAn89Bex9O");
+			const token = await getToken();
+			if (!position || !token) return null;
+			const coords = [position.coords.longitude, position.coords.latitude];
+			const data = await getNearbyUsers(coords, 1000, token);
 			setProfiles(data);
 			return data;
 		},
 	});
+
+	useEffect(() => {
+		if (position) {
+			query.refetch();
+		}
+	}, [position]);
 
 	if (query.isLoading) return <div>Loading...</div>;
 	if (query.isError)
@@ -53,7 +66,7 @@ export default function HomePage() {
 				<SwipeButton variant="dislike" onClick={() => handleSwipe("left")} />
 				<SwipeButton variant="like" onClick={() => handleSwipe("right")} />
 			</div>
-			<SetLocation />
+			<SetLocation setPosition={setPosition} position={position} />
 		</>
 	);
 }
