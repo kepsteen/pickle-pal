@@ -23,7 +23,6 @@
 	"homepage": "https://github.com/kepsteen/pickle-pal#readme",
 	"description": "",
 	"devDependencies": {
-		"@types/node": "^22.10.10",
 		"concurrently": "^9.1.2"
 	}
 }
