@@ -17,7 +17,7 @@ export default function HomePage() {
 	const [swipeDirection, setSwipeDirection] = useState<"left" | "right" | null>(
 		null
 	);
-	// const [position, setPosition] = useState<GeolocationPosition | null>(null);
+	const [position, setPosition] = useState<GeolocationPosition | null>(null);
 	const [maxDistance, setMaxDistance] = useState(25);
 
 	const { token } = useAuth();
@@ -46,7 +46,12 @@ export default function HomePage() {
 
 	return (
 		<>
-			<div className="grid place-content-center">
+			<SetLocation
+				maxDistance={maxDistance}
+				setMaxDistance={setMaxDistance}
+				setPosition={setPos}
+			/>
+			<div className="grid mt-10 place-content-center">
 				{profiles && profiles[index] && (
 					<AnimatePresence mode="wait">
 						<PalCard
@@ -61,7 +66,6 @@ export default function HomePage() {
 				<SwipeButton variant="dislike" onClick={() => handleSwipe("left")} />
 				<SwipeButton variant="like" onClick={() => handleSwipe("right")} />
 			</div>
-			<SetLocation maxDistance={maxDistance} setMaxDistance={setMaxDistance} />
 		</>
 	);
 }

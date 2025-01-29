@@ -19,8 +19,8 @@ export const SetLocation = ({
 
 	return (
 		<>
-			<p className="text-sm text-center text-gray-500">
-				Distance: {maxDistance} miles
+			<p className="pb-2 text-center text-md text-primary">
+				{sliderValue} miles
 			</p>
 			<input
 				onChange={(e) => setSliderValue(Number(e.target.value))}
