@@ -42,9 +42,8 @@ export async function getNearbyUsers(
 	maxDistance: number,
 	token: string | null
 ) {
-	if (token === null) return [];
+	if (token === null || coordinates.length === 0) return [];
 	try {
-		console.log("coordinates", coordinates);
 		const response = await fetch(
 			`/api/locations/nearby-users?lng=${coordinates[0]}&lat=${coordinates[1]}&maxDistance=${maxDistance}`,
 			{

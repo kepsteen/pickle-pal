@@ -3,13 +3,11 @@ import { AnimatePresence } from "framer-motion";
 import PalCard from "../../components/PalCard/PalCard";
 import SwipeButton from "../../components/SwipeButton/SwipeButton";
 import { ProfileData } from "../../types/profileSchema";
-import { getNearbyUsers } from "../../lib/api";
-import { useState } from "react";
+import { getNearbyUsers, setLocation } from "../../lib/api";
+import { useEffect, useState } from "react";
 import { SetLocation } from "../../components/SetLocation/SetLocation.tsx";
 import { useAuth } from "../../providers/AuthContextProvider.tsx";
-
-const MAX_DISTANCE = 1000;
-const COORDINATES = [-117.81791731292606, 33.63175885481366];
+import { formatCoordinates } from "../../lib/utils.ts";
 
 export default function HomePage() {
 	const [profiles, setProfiles] = useState<ProfileData[] | undefined>([]);
@@ -17,16 +15,38 @@ export default function HomePage() {
 	const [swipeDirection, setSwipeDirection] = useState<"left" | "right" | null>(
 		null
 	);
-	const [position, setPosition] = useState<GeolocationPosition | null>(null);
 	const [maxDistance, setMaxDistance] = useState(25);
-
+	const [position, setPosition] = useState<GeolocationPosition | null>(null);
 	const { token } = useAuth();
+	// Update user location on mount
+
+	useEffect(() => {
+		if (token) {
+			navigator.geolocation.getCurrentPosition(async (position) => {
+				try {
+					setPosition(position);
+					await setLocation(position, token);
+				} catch (error) {
+					console.error("Failed to set location:", error);
+				}
+			});
+		}
+	}, [token]);
 
 	// Fetch profiles
 	const query = useQuery({
-		queryKey: ["nearby-profiles", token, COORDINATES, maxDistance],
+		queryKey: [
+			"nearby-profiles",
+			token,
+			formatCoordinates(position),
+			maxDistance,
+		],
 		queryFn: async () => {
-			const data = await getNearbyUsers(COORDINATES, maxDistance, token);
+			const data = await getNearbyUsers(
+				formatCoordinates(position),
+				maxDistance,
+				token
+			);
 			setProfiles(data);
 			return data;
 		},
@@ -49,7 +69,7 @@ export default function HomePage() {
 			<SetLocation
 				maxDistance={maxDistance}
 				setMaxDistance={setMaxDistance}
-				setPosition={setPos}
+				setPosition={setPosition}
 			/>
 			<div className="grid mt-10 place-content-center">
 				{profiles && profiles[index] && (

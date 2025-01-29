@@ -5,7 +5,8 @@ import { SignUpFormData } from "../types/auth";
 
 export const cn = (...inputs: (string | undefined)[]) => twMerge(clsx(inputs));
 
-export function formatCoordinates(position: GeolocationPosition) {
+export function formatCoordinates(position: GeolocationPosition | null) {
+	if (position === null) return [];
 	return [position.coords.longitude, position.coords.latitude];
 }
 
