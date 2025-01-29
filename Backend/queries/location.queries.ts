@@ -1,10 +1,10 @@
 import { Location } from "../models/location.model.js";
 
 // Helper function to convert miles to meters
-const milesToMeters = (miles) => miles * 1609.34;
+const milesToMeters = (miles: number) => miles * 1609.34;
 
 export const locationQueries = {
-	findNearbyLocations: async (coordinates, miles) => {
+	findNearbyLocations: async (coordinates: number[], miles: number) => {
 		const meters = milesToMeters(miles);
 		return await Location.find({
 			location: {
@@ -19,6 +19,3 @@ export const locationQueries = {
 		});
 	},
 };
-
-// Example: Find locations within 10 miles
-const locations = await findLocationsWithinMiles([-73.856077, 40.848447], 10);

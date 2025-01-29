@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const likesSchema = mongoose.Schema(
+const likesSchema = new mongoose.Schema(
 	{
 		liker: {
 			type: mongoose.Schema.Types.ObjectId,
@@ -23,7 +23,7 @@ const likesSchema = mongoose.Schema(
 
 const Like = mongoose.model("Like", likesSchema);
 
-const matchesSchema = mongoose.Schema(
+const matchesSchema = new mongoose.Schema(
 	{
 		user1: {
 			type: mongoose.Schema.Types.ObjectId,
@@ -45,7 +45,7 @@ const matchesSchema = mongoose.Schema(
 
 const Match = mongoose.model("Match", matchesSchema);
 
-const pairsSchema = mongoose.Schema({
+const pairsSchema = new mongoose.Schema({
 	PairUser1: {
 		type: mongoose.Schema.Types.ObjectId,
 		ref: "User",
@@ -61,7 +61,7 @@ const pairsSchema = mongoose.Schema({
 
 const Pair = mongoose.model("Pair", pairsSchema);
 
-const pairLikesSchema = mongoose.Schema(
+const pairLikesSchema = new mongoose.Schema(
 	{
 		pairLiker: {
 			type: mongoose.Schema.Types.ObjectId,
@@ -84,7 +84,7 @@ const pairLikesSchema = mongoose.Schema(
 
 const PairLike = mongoose.model("PairLike", pairLikesSchema);
 
-const pairMatchesSchema = mongoose.Schema(
+const pairMatchesSchema = new mongoose.Schema(
 	{
 		pair1Id: {
 			type: mongoose.Schema.Types.ObjectId,

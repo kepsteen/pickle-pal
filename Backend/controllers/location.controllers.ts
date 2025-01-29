@@ -1,6 +1,7 @@
+import { Request, Response } from "express";
 import { Location } from "../models/location.model.js";
 
-export const setLocation = async (req, res) => {
+export const setLocation = async (req: Request, res: Response) => {
 	try {
 		const { userId } = req.auth;
 		const { coordinates } = req.body;
@@ -20,20 +21,22 @@ export const setLocation = async (req, res) => {
 		);
 
 		res.status(201).json(location);
-	} catch (error) {
+	} catch (error: unknown) {
 		console.error("Set Location Error:", error);
+		const errorMessage =
+			error instanceof Error ? error.message : "Unknown error occurred";
 		res.status(500).json({
 			error: "Failed to set user's location",
-			details: error.message,
+			details: errorMessage,
 		});
 	}
 };
 
-export const getNearByUsers = async (req, res) => {
+export const getNearByUsers = async (req: Request, res: Response) => {
 	try {
-		const maxDistance = parseInt(req.query.maxDistance) || 16093.4; // Default to 10 miles
-		const lat = parseFloat(req.query.lat);
-		const lng = parseFloat(req.query.lng);
+		const maxDistance = parseInt(req.query.maxDistance as string) || 16093.4; // Default to 10 miles
+		const lat = parseFloat(req.query.lat as string);
+		const lng = parseFloat(req.query.lng as string);
 
 		const { userId } = req.auth;
 		if (isNaN(lat) || isNaN(lng) || isNaN(maxDistance)) {
@@ -71,11 +74,13 @@ export const getNearByUsers = async (req, res) => {
 			.map((loc) => loc.userId);
 
 		res.status(200).json(userDocs);
-	} catch (error) {
+	} catch (error: unknown) {
 		console.error("Get Nearby Users Error:", error);
+		const errorMessage =
+			error instanceof Error ? error.message : "Unknown error occurred";
 		res.status(500).json({
 			error: "Failed to get nearby users",
-			details: error.message,
+			details: errorMessage,
 		});
 	}
 };

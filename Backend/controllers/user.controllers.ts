@@ -1,3 +1,4 @@
+import { Request, Response } from "express";
 import { formatUserImageName } from "../lib/utils.js";
 import { User } from "../models/profile.model.js";
 import { uploadToS3 } from "../s3/client.js";
@@ -9,22 +10,24 @@ if (process.env.NODE_ENV === "production") {
 	dotenv.config({ path: "../.env" });
 }
 
-export const createUser = async (req, res) => {
+export const createUser = async (req: Request, res: Response) => {
 	try {
 		const { email, firstName, userId } = req.body;
 
 		const newProfile = await User.create({ email, firstName, userId });
 		res.status(201).json(newProfile);
-	} catch (error) {
+	} catch (error: unknown) {
 		console.error("Create user error:", error);
+		const errorMessage =
+			error instanceof Error ? error.message : "Unknown error occurred";
 		res.status(500).json({
 			error: "Failed to create profile",
-			details: error.message,
+			details: errorMessage,
 		});
 	}
 };
 
-export const verifyEmailExists = async (req, res) => {
+export const verifyEmailExists = async (req: Request, res: Response) => {
 	try {
 		const { email } = req.params;
 		if (email === undefined) throw new Error("Email is required");
@@ -39,7 +42,7 @@ export const verifyEmailExists = async (req, res) => {
 	}
 };
 
-export const updateProfile = async (req, res) => {
+export const updateProfile = async (req: Request, res: Response) => {
 	try {
 		const { userId } = req.params;
 		const profileImage = req.file;
@@ -82,7 +85,7 @@ export const updateProfile = async (req, res) => {
 	}
 };
 
-export const getUsers = async (req, res) => {
+export const getUsers = async (req: Request, res: Response) => {
 	try {
 		const { excludeUserId } = req.query;
 
