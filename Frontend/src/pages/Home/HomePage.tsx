@@ -4,38 +4,30 @@ import PalCard from "../../components/PalCard/PalCard";
 import SwipeButton from "../../components/SwipeButton/SwipeButton";
 import { ProfileData } from "../../types/profileSchema";
 import { getNearbyUsers } from "../../lib/api";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { SetLocation } from "../../components/SetLocation/SetLocation.tsx";
-import { useAuth } from "@clerk/clerk-react";
 
 export default function HomePage() {
 	const [profiles, setProfiles] = useState<ProfileData[] | undefined>([]);
-	const [index, setIndex] = useState(5);
+	const [index, setIndex] = useState(0);
 	const [swipeDirection, setSwipeDirection] = useState<"left" | "right" | null>(
 		null
 	);
 	const [position, setPosition] = useState<GeolocationPosition | null>(null);
-	const { getToken } = useAuth();
 
-	console.log("profiles", profiles);
 	// Fetch profiles
 	const query = useQuery({
-		queryKey: ["nearbyProfiles", position, token],
+		queryKey: ["profiles"],
 		queryFn: async () => {
-			const token = await getToken();
-			if (!position || !token) return null;
-			const coords = [position.coords.longitude, position.coords.latitude];
-			const data = await getNearbyUsers(coords, 1000, token);
+			const data = await getNearbyUsers(
+				[-117.81791731292606, 33.63175885481366],
+				1000,
+				""
+			);
 			setProfiles(data);
 			return data;
 		},
 	});
-
-	useEffect(() => {
-		if (position) {
-			query.refetch();
-		}
-	}, [position]);
 
 	if (query.isLoading) return <div>Loading...</div>;
 	if (query.isError)
@@ -52,15 +44,15 @@ export default function HomePage() {
 	return (
 		<>
 			<div className="grid place-content-center">
-				<AnimatePresence mode="wait">
-					{profiles[index] && (
+				{profiles && profiles[index] && (
+					<AnimatePresence mode="wait">
 						<PalCard
 							key={index}
 							profile={profiles[index]}
 							swipeDirection={swipeDirection}
 						/>
-					)}
-				</AnimatePresence>
+					</AnimatePresence>
+				)}
 			</div>
 			<div className="flex justify-center gap-8 mt-8">
 				<SwipeButton variant="dislike" onClick={() => handleSwipe("left")} />
