@@ -11,14 +11,18 @@ if (process.env.NODE_ENV === "production") {
 // Configure and export S3 Client
 export const s3Client = new S3Client({
 	credentials: {
-		accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-		secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+		accessKeyId: process.env.AWS_ACCESS_KEY_ID as string,
+		secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY as string,
 	},
-	region: process.env.AWS_REGION,
+	region: process.env.AWS_REGION as string,
 });
 
 // s3 File upload helper function
-export const uploadToS3 = async (fileBuffer, fileName, userId) => {
+export const uploadToS3 = async (
+	fileBuffer: Buffer,
+	fileName: string,
+	userId: string
+) => {
 	const params = {
 		Bucket: process.env.AWS_BUCKET_NAME,
 		Key: fileName,
