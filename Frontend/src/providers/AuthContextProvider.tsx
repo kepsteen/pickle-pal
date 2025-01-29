@@ -1,4 +1,10 @@
-import { createContext, ReactNode, useContext } from "react";
+import {
+	createContext,
+	ReactNode,
+	useContext,
+	useEffect,
+	useState,
+} from "react";
 import {
 	useAuth as useClerkAuth,
 	useSession,
@@ -12,6 +18,7 @@ type AuthContextType = {
 	session: ActiveSessionResource | null;
 	isSignedIn: boolean | undefined;
 	isLoaded: boolean;
+	token: string | null;
 };
 
 // Now create the context with a more accurate initial state
@@ -23,15 +30,26 @@ type AuthContextProviderProps = {
 };
 
 export function AuthContextProvider({ children }: AuthContextProviderProps) {
-	const { isLoaded, isSignedIn } = useClerkAuth();
+	const [token, setToken] = useState<string | null>(null);
+
+	const { isLoaded, isSignedIn, getToken } = useClerkAuth();
 	const { user } = useUser();
 	const { session } = useSession();
+
+	useEffect(() => {
+		const fetchToken = async () => {
+			const token = await getToken();
+			setToken(token);
+		};
+		fetchToken();
+	}, [getToken, user]);
 
 	const authValue: AuthContextType = {
 		isLoaded,
 		isSignedIn: isSignedIn ?? false,
 		user: user ?? null,
 		session: session ?? null,
+		token,
 	};
 
 	return (

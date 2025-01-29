@@ -1,44 +1,37 @@
-import { useQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
-import { setLocation } from "../../lib/api";
-import { useAuth } from "@clerk/clerk-react";
+// import { setLocation } from "../../lib/api";
+
+import { useState } from "react";
 
 type SetLocationProps = {
-	setPosition: (value: GeolocationPosition | null) => void;
-	position: GeolocationPosition | null;
+	// setPosition: (value: GeolocationPosition | null) => void;
+	// position: GeolocationPosition | null;
+	setMaxDistance: (value: number) => void;
+	maxDistance: number;
 };
 
-export const SetLocation = ({ setPosition, position }: SetLocationProps) => {
-	const { getToken } = useAuth();
-
-	const query = useQuery({
-		queryKey: ["setLocation"],
-		queryFn: async () => {
-			const token = await getToken();
-			if (!position || !token) return null;
-			const data = await setLocation(position, token);
-			return data;
-		},
-	});
-
-	useEffect(() => {
-		if (position) {
-			const pos = {
-				coordinates: [position?.coords.longitude, position?.coords.latitude],
-			};
-			console.log("pos", pos);
-		}
-	}, [position, query]);
-
-	function handleGetLocation() {
-		navigator.geolocation.getCurrentPosition((pos) => setPosition(pos));
-		query.refetch();
-	}
+export const SetLocation = ({
+	// setPosition,
+	// position,
+	maxDistance,
+	setMaxDistance,
+}: SetLocationProps) => {
+	const [sliderValue, setSliderValue] = useState(maxDistance);
 
 	return (
 		<>
-			<button onClick={handleGetLocation}>Get location</button>
-			<p>{JSON.stringify(query.data)}</p>
+			<p className="text-sm text-center text-gray-500">
+				Distance: {maxDistance} miles
+			</p>
+			<input
+				onChange={(e) => setSliderValue(Number(e.target.value))}
+				onMouseUp={() => setMaxDistance(sliderValue)}
+				onTouchEnd={() => setMaxDistance(sliderValue)}
+				type="range"
+				min={1}
+				max="100"
+				value={sliderValue} // Use local state for the slider value
+				className="w-2/3 mx-auto range range-primary"
+			/>
 		</>
 	);
 };

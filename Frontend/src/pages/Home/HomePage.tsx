@@ -6,6 +6,10 @@ import { ProfileData } from "../../types/profileSchema";
 import { getNearbyUsers } from "../../lib/api";
 import { useState } from "react";
 import { SetLocation } from "../../components/SetLocation/SetLocation.tsx";
+import { useAuth } from "../../providers/AuthContextProvider.tsx";
+
+const MAX_DISTANCE = 1000;
+const COORDINATES = [-117.81791731292606, 33.63175885481366];
 
 export default function HomePage() {
 	const [profiles, setProfiles] = useState<ProfileData[] | undefined>([]);
@@ -13,17 +17,16 @@ export default function HomePage() {
 	const [swipeDirection, setSwipeDirection] = useState<"left" | "right" | null>(
 		null
 	);
-	const [position, setPosition] = useState<GeolocationPosition | null>(null);
+	// const [position, setPosition] = useState<GeolocationPosition | null>(null);
+	const [maxDistance, setMaxDistance] = useState(25);
+
+	const { token } = useAuth();
 
 	// Fetch profiles
 	const query = useQuery({
-		queryKey: ["profiles"],
+		queryKey: ["nearby-profiles", token, COORDINATES, maxDistance],
 		queryFn: async () => {
-			const data = await getNearbyUsers(
-				[-117.81791731292606, 33.63175885481366],
-				1000,
-				""
-			);
+			const data = await getNearbyUsers(COORDINATES, maxDistance, token);
 			setProfiles(data);
 			return data;
 		},
@@ -58,7 +61,7 @@ export default function HomePage() {
 				<SwipeButton variant="dislike" onClick={() => handleSwipe("left")} />
 				<SwipeButton variant="like" onClick={() => handleSwipe("right")} />
 			</div>
-			<SetLocation setPosition={setPosition} position={position} />
+			<SetLocation maxDistance={maxDistance} setMaxDistance={setMaxDistance} />
 		</>
 	);
 }

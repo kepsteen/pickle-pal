@@ -40,8 +40,9 @@ export async function setLocation(
 export async function getNearbyUsers(
 	coordinates: number[],
 	maxDistance: number,
-	token: string
+	token: string | null
 ) {
+	if (token === null) return [];
 	try {
 		console.log("coordinates", coordinates);
 		const response = await fetch(
