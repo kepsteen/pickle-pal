@@ -34,7 +34,10 @@ router.get("/verify/:email", verifyEmailExists);
 // Update Profile
 router.patch("/:userId", upload.single("profileImage"), updateProfile);
 
-//
+// Update Settings
+// router.post("/:userId/settings", updateSettings);
+
+// Get all users
 router.get("/all", getUsers);
 
 export const usersRouter = router;

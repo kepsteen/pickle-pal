@@ -3,19 +3,50 @@ import { AnimatePresence } from "framer-motion";
 import PalCard from "../../components/PalCard/PalCard";
 import SwipeButton from "../../components/SwipeButton/SwipeButton";
 import { ProfileData } from "../../types/profileSchema";
-import { getUsers } from "../../lib/api";
-import { useState } from "react";
+import { getNearbyUsers, setLocation } from "../../lib/api";
+import { useEffect, useState } from "react";
+import { SetLocation } from "../../components/SetLocation/SetLocation.tsx";
+import { useAuth } from "../../providers/AuthContextProvider.tsx";
+import { formatCoordinates } from "../../lib/utils.ts";
 
 export default function HomePage() {
-	const [profiles, setProfiles] = useState<ProfileData[]>([]);
-	const [index, setIndex] = useState(5);
+	const [profiles, setProfiles] = useState<ProfileData[] | undefined>([]);
+	const [index, setIndex] = useState(0);
 	const [swipeDirection, setSwipeDirection] = useState<"left" | "right" | null>(
 		null
 	);
+	const [maxDistance, setMaxDistance] = useState(25);
+	const [position, setPosition] = useState<GeolocationPosition | null>(null);
+	const { token } = useAuth();
+	// Update user location on mount
+
+	useEffect(() => {
+		if (token) {
+			navigator.geolocation.getCurrentPosition(async (position) => {
+				try {
+					setPosition(position);
+					await setLocation(position, token);
+				} catch (error) {
+					console.error("Failed to set location:", error);
+				}
+			});
+		}
+	}, [token]);
+
+	// Fetch profiles
 	const query = useQuery({
-		queryKey: ["profiles"],
+		queryKey: [
+			"nearby-profiles",
+			token,
+			formatCoordinates(position),
+			maxDistance,
+		],
 		queryFn: async () => {
-			const data = await getUsers("user_2rgLaUCcJmigG45v2SAn89Bex9O");
+			const data = await getNearbyUsers(
+				formatCoordinates(position),
+				maxDistance,
+				token
+			);
 			setProfiles(data);
 			return data;
 		},
@@ -35,16 +66,21 @@ export default function HomePage() {
 
 	return (
 		<>
-			<div className="grid place-content-center">
-				<AnimatePresence mode="wait">
-					{profiles[index] && (
+			<SetLocation
+				maxDistance={maxDistance}
+				setMaxDistance={setMaxDistance}
+				setPosition={setPosition}
+			/>
+			<div className="grid mt-10 place-content-center">
+				{profiles && profiles[index] && (
+					<AnimatePresence mode="wait">
 						<PalCard
 							key={index}
 							profile={profiles[index]}
 							swipeDirection={swipeDirection}
 						/>
-					)}
-				</AnimatePresence>
+					</AnimatePresence>
+				)}
 			</div>
 			<div className="flex justify-center gap-8 mt-8">
 				<SwipeButton variant="dislike" onClick={() => handleSwipe("left")} />

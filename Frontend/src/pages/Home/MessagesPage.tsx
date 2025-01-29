@@ -3,14 +3,14 @@ import { useAuth } from "@clerk/clerk-react";
 export default function MessagesPage() {
 	const { getToken } = useAuth();
 
-	const fetchMessages = async () => {
+	const testAuthMiddleware = async () => {
 		try {
 			const token = await getToken();
 			if (!token) {
 				throw new Error("No token available");
 			}
 
-			const response = await fetch("/api/messages", {
+			const response = await fetch("/api/test-auth-middleware", {
 				headers: {
 					Authorization: `Bearer ${token}`,
 					"Content-Type": "application/json",
@@ -29,5 +29,5 @@ export default function MessagesPage() {
 		}
 	};
 
-	return <button onClick={fetchMessages}>Fetch messages</button>;
+	return <button onClick={testAuthMiddleware}>Fetch messages</button>;
 }

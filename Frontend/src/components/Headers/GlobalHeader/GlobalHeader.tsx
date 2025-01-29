@@ -1,4 +1,10 @@
-import { MapPinned, MessageSquare, UserCog, Users } from "lucide-react";
+import {
+	MapPinned,
+	MessageSquare,
+	// SlidersHorizontal,
+	UserCog,
+	Users,
+} from "lucide-react";
 import { NavLink } from "react-router";
 
 export default function GlobalHeader() {
@@ -57,7 +63,15 @@ export default function GlobalHeader() {
 						</ul>
 					</li>
 
-					<li className="flex justify-end [&_svg]:text-base-content">
+					<li className="flex gap-4 justify-end [&_svg]:text-base-content">
+						{/* <NavLink
+							to="/settings"
+							className={({ isActive }) =>
+								isActive ? "border border-b-base-content" : ""
+							}
+						>
+							<SlidersHorizontal />
+						</NavLink> */}
 						<NavLink
 							to="/settings"
 							className={({ isActive }) =>

@@ -8,7 +8,7 @@ import HomeLayout from "./layouts/HomeLayout.tsx";
 import HomePage from "./pages/Home/HomePage.tsx";
 import { AuthContextProvider } from "./providers/AuthContextProvider";
 import MessagesPage from "./pages/Home/MessagesPage.tsx";
-import ProtectedRoute from "./components/ProtectedRoute.tsx";
+import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute.tsx";
 
 function App() {
 	return (

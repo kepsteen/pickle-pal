@@ -7,6 +7,7 @@ import { connectDB } from "./db/connect.js";
 import path from "path";
 import { fileURLToPath } from "url";
 import { clerkMiddleware, requireAuth } from "@clerk/express";
+import { locationsRouter } from "./routes/location.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -38,11 +39,13 @@ app.get("/", (req, res) => {
 
 app.use("/api/users", usersRouter);
 
-app.get("/api/messages", requireAuth(), async (req, res) => {
+app.use("/api/locations", locationsRouter);
+
+app.get("/api/test-auth-middleware", requireAuth(), async (req, res) => {
 	try {
 		const { userId } = req.auth;
 		console.log("userId", userId);
-		res.status(200).json(userId);
+		res.status(200).json({ userId });
 	} catch (error) {
 		res.status(500).json({ error: "Internal Server Error" });
 	}
