@@ -1,4 +1,4 @@
-import express, { Router } from "express";
+import express, { Request, Response } from "express";
 import { MongoClient } from "mongodb";
 import "dotenv/config";
 import { usersRouter } from "./routes/user.js";
@@ -6,7 +6,7 @@ import cors from "cors";
 import { connectDB } from "./db/connect.js";
 import path from "path";
 import { fileURLToPath } from "url";
-import { clerkMiddleware, requireAuth } from "@clerk/express";
+import { clerkMiddleware, requireAuth, AuthObject } from "@clerk/express";
 import { locationsRouter } from "./routes/location.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -41,15 +41,19 @@ app.use("/api/users", usersRouter);
 
 app.use("/api/locations", locationsRouter);
 
-app.get("/api/test-auth-middleware", requireAuth(), async (req, res) => {
-	try {
-		const { userId } = req.auth;
-		console.log("userId", userId);
-		res.status(200).json({ userId });
-	} catch (error) {
-		res.status(500).json({ error: "Internal Server Error" });
+app.get(
+	"/api/test-auth-middleware",
+	requireAuth(),
+	async (req: Request, res: Response) => {
+		try {
+			const { userId } = req.auth;
+			console.log("userId", userId);
+			res.status(200).json({ userId });
+		} catch (error) {
+			res.status(500).json({ error: "Internal Server Error" });
+		}
 	}
-});
+);
 
 // Serve index.html for all other routes (for client-side routing)
 app.get("*", (req, res) => {

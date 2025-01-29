@@ -1,5 +1,4 @@
 import crypto from "crypto";
-
 export function formatUserImageName(originalname, userId, folder) {
-	return `${folder}/${userId}/${crypto.randomUUID()}-${originalname}`;
+    return "".concat(folder, "/").concat(userId, "/").concat(crypto.randomUUID(), "-").concat(originalname);
 }
