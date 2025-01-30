@@ -106,8 +106,7 @@ export const addLike = async (req: Request, res: Response) => {
 		const { userId: likerUserId } = req.auth;
 		const { userId: likedUserId } = req.params;
 		const { isLike } = req.body;
-		// const { isLike, userId: likerUserId } = req.body;
-		console.log("req.body", req.body);
+
 		// Find both users to get their MongoDB _id
 		const [likerUser, likedUser] = await Promise.all([
 			User.findOne({ userId: likerUserId }),
