@@ -58,3 +58,24 @@ export async function getNearbyUsers(
 		console.error("Error fetching nearby users", error);
 	}
 }
+
+export async function addLike(
+	isLike: boolean,
+	likedUserId: string,
+	token: string | null
+) {
+	if (token === null) return;
+	try {
+		const response = await fetch(`/api/users/${likedUserId}/likes`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({ isLike }),
+		});
+		if (!response.ok) throw new Error(`Failed to add like`);
+		return await response.json();
+	} catch (error) {
+		console.error("Error adding like", error);
+	}
+}

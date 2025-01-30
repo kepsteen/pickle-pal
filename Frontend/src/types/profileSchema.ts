@@ -24,6 +24,7 @@ export const profileSchema = z.object({
 export type ProfileFormData = z.infer<typeof profileSchema>;
 
 export type ProfileData = {
+	userId: string;
 	firstName: string;
 	skillLevel: "Beginner" | "Intermediate" | "Advanced";
 	playStyle: "Dinker" | "Hybrid" | "Banger";
