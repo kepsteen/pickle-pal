@@ -4,8 +4,10 @@ import {
 	verifyEmailExists,
 	updateProfile,
 	getUsers,
+	addLike,
 } from "../controllers/user.controllers.js";
 import multer from "multer";
+import { requireAuth } from "@clerk/express";
 
 const router = express.Router();
 
@@ -33,6 +35,8 @@ router.get("/verify/:email", verifyEmailExists);
 
 // Update Profile
 router.patch("/:userId", upload.single("profileImage"), updateProfile);
+
+router.post("/:userId/likes", requireAuth(), addLike);
 
 // Update Settings
 // router.post("/:userId/settings", updateSettings);

@@ -1,9 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { AnimatePresence } from "framer-motion";
 import PalCard from "../../components/PalCard/PalCard";
 import SwipeButton from "../../components/SwipeButton/SwipeButton";
 import { ProfileData } from "../../types/profileSchema";
-import { getNearbyUsers, setLocation } from "../../lib/api";
+import { addLike, getNearbyUsers, setLocation } from "../../lib/api";
 import { useEffect, useState } from "react";
 import { SetLocation } from "../../components/SetLocation/SetLocation.tsx";
 import { useAuth } from "../../providers/AuthContextProvider.tsx";
@@ -52,16 +52,31 @@ export default function HomePage() {
 		},
 	});
 
+	// Move this before the if statements
+	const swipeMutation = useMutation({
+		mutationKey: ["swipe", token, profiles?.[0]?.userId, token],
+		mutationFn: async (isLike: boolean) => {
+			if (!profiles?.length) return;
+			const data = await addLike(isLike, profiles[0].userId, token);
+			return data;
+		},
+	});
+
 	if (query.isLoading) return <div>Loading...</div>;
 	if (query.isError)
 		return <div>{`Error loading profiles: ${query.error}`}</div>;
 
-	const handleSwipe = (direction: "left" | "right") => {
-		setSwipeDirection(direction);
-		setTimeout(() => {
-			setIndex((prev) => prev + (direction === "right" ? 1 : -1));
-			setSwipeDirection(null);
-		}, 100);
+	// const handleSwipe = (direction: "left" | "right") => {
+	// 	setSwipeDirection(direction);
+	// 	setTimeout(() => {
+	// 		setIndex((prev) => prev + (direction === "right" ? 1 : -1));
+	// 		setSwipeDirection(null);
+	// 	}, 100);
+	// };
+
+	const handleSwipeInteraction = (isLike: boolean) => {
+		swipeMutation.mutate(isLike);
+		setProfiles((prev) => prev?.slice(1) || []);
 	};
 
 	return (
@@ -82,10 +97,18 @@ export default function HomePage() {
 					</AnimatePresence>
 				)}
 			</div>
-			<div className="flex justify-center gap-8 mt-8">
-				<SwipeButton variant="dislike" onClick={() => handleSwipe("left")} />
-				<SwipeButton variant="like" onClick={() => handleSwipe("right")} />
-			</div>
+			{profiles && profiles.length !== 0 && (
+				<div className="flex justify-center gap-8 mt-8">
+					<SwipeButton
+						variant="dislike"
+						onClick={() => handleSwipeInteraction(false)}
+					/>
+					<SwipeButton
+						variant="like"
+						onClick={() => handleSwipeInteraction(true)}
+					/>
+				</div>
+			)}
 		</>
 	);
 }

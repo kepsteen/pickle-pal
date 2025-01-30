@@ -3,6 +3,7 @@ import { formatUserImageName } from "../lib/utils.js";
 import { User } from "../models/profile.model.js";
 import { uploadToS3 } from "../s3/client.js";
 import dotenv from "dotenv";
+import { Like, Match } from "../models/matches.model.js";
 
 if (process.env.NODE_ENV === "production") {
 	dotenv.config({ path: "/etc/app.env" });
@@ -97,5 +98,65 @@ export const getUsers = async (req: Request, res: Response) => {
 	} catch (error) {
 		console.error("Error finding users", error);
 		res.status(500).json({ error: "Error fetching users" });
+	}
+};
+
+export const addLike = async (req: Request, res: Response) => {
+	try {
+		const { userId: likerUserId } = req.auth;
+		const { userId: likedUserId } = req.params;
+		const { isLike } = req.body;
+
+		// Find both users to get their MongoDB _id
+		const [likerUser, likedUser] = await Promise.all([
+			User.findOne({ userId: likerUserId }),
+			User.findOne({ userId: likedUserId }),
+		]);
+
+		if (!likerUser || !likedUser) {
+			console.log("likerUser", likerUser);
+			console.log("likedUser", likedUser);
+			return res.status(404).json({ error: "One or both users not found" });
+		}
+
+		// Create the like record
+		const newLike = await Like.create({
+			liker: likerUser._id,
+			liked: likedUser._id,
+			isLike,
+		});
+
+		// Check if there's a mutual like
+		const mutualLike = await Like.findOne({
+			liker: likedUser._id,
+			liked: likerUser._id,
+			isLike: true,
+		});
+
+		if (mutualLike) {
+			// Create a match if there's a mutual like
+			await Match.create({
+				user1: likerUser._id,
+				user2: likedUser._id,
+			});
+
+			// Get the full user document for the liked user
+			const matchedUser = await User.findById(likedUser._id);
+
+			return res.status(201).json({
+				like: newLike,
+				isMatch: true,
+				matchedUser: matchedUser,
+			});
+		}
+
+		res.status(201).json({
+			like: newLike,
+			isMatch: false,
+			matchedUser: null,
+		});
+	} catch (error) {
+		console.error("Error adding like", error);
+		res.status(500).json({ error: "Error adding like" });
 	}
 };
