@@ -11,12 +11,12 @@ import { formatCoordinates } from "../../lib/utils.ts";
 
 export default function HomePage() {
 	const [profiles, setProfiles] = useState<ProfileData[] | undefined>([]);
-	const [index, setIndex] = useState(0);
+	const [maxDistance, setMaxDistance] = useState(25);
+	const [position, setPosition] = useState<GeolocationPosition | null>(null);
 	const [swipeDirection, setSwipeDirection] = useState<"left" | "right" | null>(
 		null
 	);
-	const [maxDistance, setMaxDistance] = useState(25);
-	const [position, setPosition] = useState<GeolocationPosition | null>(null);
+
 	const { token } = useAuth();
 	// Update user location on mount
 
@@ -66,15 +66,8 @@ export default function HomePage() {
 	if (query.isError)
 		return <div>{`Error loading profiles: ${query.error}`}</div>;
 
-	// const handleSwipe = (direction: "left" | "right") => {
-	// 	setSwipeDirection(direction);
-	// 	setTimeout(() => {
-	// 		setIndex((prev) => prev + (direction === "right" ? 1 : -1));
-	// 		setSwipeDirection(null);
-	// 	}, 100);
-	// };
-
 	const handleSwipeInteraction = (isLike: boolean) => {
+		setSwipeDirection(isLike ? "right" : "left");
 		swipeMutation.mutate(isLike);
 		setProfiles((prev) => prev?.slice(1) || []);
 	};
@@ -87,11 +80,11 @@ export default function HomePage() {
 				setPosition={setPosition}
 			/>
 			<div className="grid mt-10 place-content-center">
-				{profiles && profiles[index] && (
+				{profiles && profiles[0] && (
 					<AnimatePresence mode="wait">
 						<PalCard
-							key={index}
-							profile={profiles[index]}
+							key={profiles[0].userId}
+							profile={profiles[0]}
 							swipeDirection={swipeDirection}
 						/>
 					</AnimatePresence>
