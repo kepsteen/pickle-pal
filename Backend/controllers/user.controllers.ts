@@ -99,3 +99,18 @@ export const getUsers = async (req: Request, res: Response) => {
 		res.status(500).json({ error: "Error fetching users" });
 	}
 };
+
+export const addLike = async (req: Request, res: Response) => {
+	try {
+		const { userId } = req.auth;
+		const { likedUserId } = req.params;
+
+		const user = await User.findOne({ userId });
+		if (!user) {
+			return res.status(404).json({ error: "User not found" });
+		}
+	} catch (error) {
+		console.error("Error adding like", error);
+		res.status(500).json({ error: "Error adding like" });
+	}
+};
