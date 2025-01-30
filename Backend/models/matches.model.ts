@@ -3,13 +3,13 @@ import mongoose from "mongoose";
 const likesSchema = new mongoose.Schema(
 	{
 		liker: {
-			type: mongoose.Schema.Types.ObjectId,
-			ref: "User",
+			type: String,
+			ref: "InitialUser",
 			required: true,
 		},
 		liked: {
-			type: mongoose.Schema.Types.ObjectId,
-			ref: "User",
+			type: String,
+			ref: "InitialUser",
 			required: true,
 		},
 		isLike: { type: Boolean },

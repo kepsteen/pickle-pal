@@ -121,27 +121,27 @@ export const addLike = async (req: Request, res: Response) => {
 
 		// Create the like record
 		const newLike = await Like.create({
-			liker: likerUser._id,
-			liked: likedUser._id,
+			liker: likerUser.userId,
+			liked: likedUser.userId,
 			isLike,
 		});
 
 		// Check if there's a mutual like
 		const mutualLike = await Like.findOne({
-			liker: likedUser._id,
-			liked: likerUser._id,
+			liker: likedUser.userId,
+			liked: likerUser.userId,
 			isLike: true,
 		});
 
 		if (mutualLike) {
 			// Create a match if there's a mutual like
 			await Match.create({
-				user1: likerUser._id,
-				user2: likedUser._id,
+				user1: likerUser.userId,
+				user2: likedUser.userId,
 			});
 
 			// Get the full user document for the liked user
-			const matchedUser = await User.findById(likedUser._id);
+			const matchedUser = await User.findOne({ userId: likedUser.userId });
 
 			return res.status(201).json({
 				like: newLike,
