@@ -1,13 +1,12 @@
 import { Request, Response } from "express";
 import { Location } from "../models/location.model.js";
+import { Like } from "../models/matches.model.js";
+import { UserDocument } from "../types/types.js";
 
 export const setLocation = async (req: Request, res: Response) => {
 	try {
 		const { userId } = req.auth;
 		const { coordinates } = req.body;
-		console.log("coords", coordinates);
-
-		console.log("endpoint hit");
 
 		const location = await Location.findOneAndUpdate(
 			{ userId },
@@ -69,11 +68,28 @@ export const getNearByUsers = async (req: Request, res: Response) => {
 			})
 			.exec();
 
-		const userDocs = users
+		const userDocs: UserDocument[] = users
 			.filter((loc) => loc.userId !== null)
-			.map((loc) => loc.userId);
+			.map((loc) => loc.userId as unknown as UserDocument);
 
-		res.status(200).json(userDocs);
+		console.log("userDocs", userDocs);
+
+		//got nearby users
+		const interactedLikes = await Like.find({
+			liker: userId,
+		}).select("liked");
+
+		console.log("interactedLikes", interactedLikes);
+
+		const interactedUsers = interactedLikes.map((like) => like.liked);
+
+		console.log("interactedUsers", interactedUsers);
+		const filteredUsers = userDocs.filter(
+			(user: UserDocument) => !interactedUsers.includes(user.userId)
+		);
+
+		console.log("filteredUsers", filteredUsers);
+		res.status(200).json(filteredUsers);
 	} catch (error: unknown) {
 		console.error("Get Nearby Users Error:", error);
 		const errorMessage =
@@ -82,5 +98,26 @@ export const getNearByUsers = async (req: Request, res: Response) => {
 			error: "Failed to get nearby users",
 			details: errorMessage,
 		});
+	}
+};
+
+export const getNewNearbyUsers = async (req: Request, res: Response) => {
+	try {
+		const { userId } = req.auth;
+		const maxDistance = parseInt(req.query.maxDistance as string) || 16093.4; // Default to 10 miles
+		const lat = parseFloat(req.query.lat as string);
+		const lng = parseFloat(req.query.lng as string);
+
+		const users = await Like.find({
+			likerId: { $ne: userId },
+		}).populate({
+			path: "userId",
+			model: "InitialUser",
+			match: { userId: { $exists: true } },
+			localField: "userId",
+			foreignField: "userId",
+		});
+	} catch (error: unknown) {
+		console.error("Get New Nearby Users Error:", error);
 	}
 };
