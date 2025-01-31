@@ -9,6 +9,7 @@ import HomePage from "./pages/Home/HomePage.tsx";
 import { AuthContextProvider } from "./providers/AuthContextProvider";
 import MessagesPage from "./pages/Home/MessagesPage.tsx";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute.tsx";
+import { Toaster } from "react-hot-toast";
 
 function App() {
 	return (
@@ -42,6 +43,12 @@ function App() {
 					</Route>
 				</Route>
 			</Routes>
+			<Toaster
+				toastOptions={{
+					duration: 2500,
+					className: "bg-base-200 py-4 px-6 w-96 cursor-pointer",
+				}}
+			/>
 		</AuthContextProvider>
 	);
 }

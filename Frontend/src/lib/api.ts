@@ -1,4 +1,5 @@
-import { ProfileData } from "../types/profileSchema";
+import { ProfileData } from "../types/user.types";
+import { AddLikeResponse } from "../types/user.types";
 
 export async function getUsers(currentUserId: string) {
 	// const response = await fetch(`/api/users/all?currentUserId=${currentUserId}`);
@@ -48,7 +49,7 @@ export async function getNearbyUsers(
 			`/api/locations/nearby-users?lng=${coordinates[0]}&lat=${coordinates[1]}&maxDistance=${maxDistance}`,
 			{
 				headers: {
-					Authorizartion: `Bearer ${token}`,
+					Authorization: `Bearer ${token}`,
 				},
 			}
 		);
@@ -59,23 +60,32 @@ export async function getNearbyUsers(
 	}
 }
 
-export async function addLike(
+export const addLike = async (
+	userId: string,
 	isLike: boolean,
-	likedUserId: string,
 	token: string | null
-) {
+): Promise<AddLikeResponse | undefined> => {
 	if (token === null) return;
+	console.log("userId", userId);
+	console.log("isLike", isLike);
+	console.log("token", token);
 	try {
-		const response = await fetch(`/api/users/${likedUserId}/likes`, {
+		const response = await fetch(`/api/users/${userId}/likes`, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
+				Authorization: `Bearer ${token}`,
 			},
 			body: JSON.stringify({ isLike }),
 		});
-		if (!response.ok) throw new Error(`Failed to add like`);
+
+		if (!response.ok) {
+			throw new Error("Failed to add like");
+		}
+
 		return await response.json();
 	} catch (error) {
-		console.error("Error adding like", error);
+		console.error("Error adding like:", error);
+		throw error; // Re-throw the error so the calling component can handle it
 	}
-}
+};

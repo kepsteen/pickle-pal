@@ -1,4 +1,6 @@
 import { useAuth } from "@clerk/clerk-react";
+import toast from "react-hot-toast";
+import { MatchToast } from "../../components/Toast/Toast";
 
 export default function MessagesPage() {
 	const { getToken } = useAuth();
@@ -29,5 +31,10 @@ export default function MessagesPage() {
 		}
 	};
 
-	return <button onClick={testAuthMiddleware}>Fetch messages</button>;
+	return (
+		<>
+			<button onClick={testAuthMiddleware}>Fetch messages</button>
+			<button onClick={() => toast(<MatchToast name="John" />)}>Toast</button>
+		</>
+	);
 }

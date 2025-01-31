@@ -2,12 +2,14 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { AnimatePresence } from "framer-motion";
 import PalCard from "../../components/PalCard/PalCard";
 import SwipeButton from "../../components/SwipeButton/SwipeButton";
-import { ProfileData } from "../../types/profileSchema";
+import { ProfileData } from "../../types/user.types.ts";
 import { addLike, getNearbyUsers, setLocation } from "../../lib/api";
 import { useEffect, useState } from "react";
 import { SetLocation } from "../../components/SetLocation/SetLocation.tsx";
 import { useAuth } from "../../providers/AuthContextProvider.tsx";
 import { formatCoordinates } from "../../lib/utils.ts";
+import { toast } from "react-hot-toast";
+import { MatchToast } from "../../components/Toast/Toast";
 
 export default function HomePage() {
 	const [profiles, setProfiles] = useState<ProfileData[] | undefined>([]);
@@ -57,7 +59,11 @@ export default function HomePage() {
 		mutationKey: ["swipe", token, profiles?.[0]?.userId, token],
 		mutationFn: async (isLike: boolean) => {
 			if (!profiles?.length) return;
-			const data = await addLike(isLike, profiles[0].userId, token);
+			const data = await addLike(profiles[0].userId, isLike, token);
+			if (data?.isMatch) {
+				toast(<MatchToast name={data.matchedUser!.firstName} />);
+			}
+			console.log("data", data);
 			return data;
 		},
 	});
