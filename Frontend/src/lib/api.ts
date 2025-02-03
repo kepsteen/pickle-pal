@@ -89,3 +89,18 @@ export const addLike = async (
 		throw error; // Re-throw the error so the calling component can handle it
 	}
 };
+
+export async function getPals(token: string | null) {
+	if (token === null) return [];
+	try {
+		const response = await fetch("/api/users/pals", {
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		});
+		if (!response.ok) throw new Error("Failed to fetch pals");
+		return (await response.json()) as ProfileData[];
+	} catch (error) {
+		console.error("Error fetching pals:", error);
+	}
+}
