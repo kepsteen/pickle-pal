@@ -34,7 +34,7 @@ export default function GlobalHeader() {
 								<NavLink
 									to="/pals"
 									className={({ isActive }) =>
-										`block p-2 ${isActive ? "border-b-2 border-b-primary" : ""}`
+										`block p-2 ${isActive ? "border-b-4 border-b-primary" : ""}`
 									}
 								>
 									<Users />
@@ -44,7 +44,7 @@ export default function GlobalHeader() {
 								<NavLink
 									to="/map"
 									className={({ isActive }) =>
-										`block p-2 ${isActive ? "border-b-2 border-b-primary" : ""}`
+										`block p-2 ${isActive ? "border-b-4 border-b-primary" : ""}`
 									}
 								>
 									<MapPinned />
