@@ -8,6 +8,9 @@ export default {
 			minHeight: {
 				"main-content": "calc(100vh - 80px)",
 			},
+			maxHeight: {
+				"main-content": "calc(100vh - 80px)",
+			},
 			colors: {
 				muted: "oklch(70% 0.012 75)",
 			},
