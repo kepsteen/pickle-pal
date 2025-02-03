@@ -10,6 +10,7 @@ import { AuthContextProvider } from "./providers/AuthContextProvider";
 import MessagesPage from "./pages/Home/MessagesPage.tsx";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute.tsx";
 import { Toaster } from "react-hot-toast";
+import PalsPage from "./pages/Home/PalsPage.tsx";
 
 function App() {
 	return (
@@ -38,6 +39,7 @@ function App() {
 					>
 						<Route path="home" element={<HomePage />} />
 						<Route path="messages" element={<MessagesPage />} />
+						<Route path="pals" element={<PalsPage />} />
 						{/* messages page */}
 						{/* map page */}
 					</Route>
