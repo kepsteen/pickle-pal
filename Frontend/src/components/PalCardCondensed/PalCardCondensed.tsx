@@ -1,21 +1,29 @@
 import { NavLink } from "react-router";
+import { cn } from "../../lib/utils";
 
 type PalCardCondensedProps = {
 	palId: string;
 	name: string;
 	imageUrl: string;
+	className?: string;
 };
 
 export default function PalCardCondensed({
 	palId,
 	name,
 	imageUrl,
+	className,
 }: PalCardCondensedProps) {
 	return (
 		<NavLink to={`/pals/${palId}`}>
-			<article className="relative flex items-center justify-start gap-8 px-12 py-8 rounded-lg bg-base-200 w-96">
+			<article
+				className={cn(
+					"relative flex items-center justify-start gap-8 px-6 py-6 rounded-lg bg-base-200 hover:bg-base-300 transition-colors ease-in-out duration-300",
+					className
+				)}
+			>
 				<div className="avatar">
-					<div className="w-16 rounded-full ring-primary ring-offset-base-100 ring ring-offset-2">
+					<div className="w-10 rounded-full ring-primary ring-offset-base-100 ring ring-offset-2">
 						<img src={imageUrl} />
 					</div>
 				</div>

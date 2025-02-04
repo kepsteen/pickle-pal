@@ -39,7 +39,7 @@ function App() {
 					>
 						<Route path="home" element={<HomePage />} />
 						<Route path="messages" element={<MessagesPage />} />
-						<Route path="pals" element={<PalsPage />} />
+						<Route path="pals/:userId?" element={<PalsPage />} />
 						{/* messages page */}
 						{/* map page */}
 					</Route>
