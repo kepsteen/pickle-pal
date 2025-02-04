@@ -5,6 +5,7 @@ import {
 	updateProfile,
 	getUsers,
 	addLike,
+	getPals,
 } from "../controllers/user.controllers.js";
 import multer from "multer";
 import { requireAuth } from "@clerk/express";
@@ -36,7 +37,11 @@ router.get("/verify/:email", verifyEmailExists);
 // Update Profile
 router.patch("/:userId", upload.single("profileImage"), updateProfile);
 
+// Like a user
 router.post("/:userId/likes", requireAuth(), addLike);
+
+// Get all pals
+router.get("/pals", requireAuth(), getPals);
 
 // Update Settings
 // router.post("/:userId/settings", updateSettings);

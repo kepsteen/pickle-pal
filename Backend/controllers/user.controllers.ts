@@ -161,3 +161,27 @@ export const addLike = async (req: Request, res: Response) => {
 		res.status(500).json({ error: "Error adding like" });
 	}
 };
+
+export const getPals = async (req: Request, res: Response) => {
+	try {
+		const { userId } = req.auth;
+		const matches = await Match.find({
+			$or: [{ user1: userId }, { user2: userId }],
+		});
+
+		// Get the other user's ID from each match
+		const palIds = matches.map((match) =>
+			match.user1 === userId ? match.user2 : match.user1
+		);
+
+		const pals = await User.find({
+			userId: { $in: palIds },
+		});
+
+		console.log("pals", pals);
+		res.status(200).json(pals);
+	} catch (error) {
+		console.error("Error fetching pals", error);
+		res.status(500).json({ error: "Error fetching pals" });
+	}
+};
