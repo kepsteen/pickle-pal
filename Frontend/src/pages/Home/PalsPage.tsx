@@ -10,7 +10,7 @@ import Label from "../../components/Label/Label.tsx";
 import { Input } from "../../components/Input/Input.tsx";
 import Button from "../../components/Button/Button.tsx";
 import { cn } from "../../lib/utils.ts";
-
+import ChatWindow from "../../components/ChatWindow/ChatWindow.tsx";
 // const pals = [
 // 	{
 // 		palId: "1",
@@ -179,7 +179,7 @@ export default function PalsPage() {
 								<EllipsisVerticalIcon className="w-6 h-6 text-primary" />
 							</div>
 						))}
-					<div></div>
+					<ChatWindow />
 					<div className="flex items-center gap-2 px-4 py-4 border-t-4 border-t-base-200">
 						<Label>
 							<Input

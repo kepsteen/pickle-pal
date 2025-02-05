@@ -11,6 +11,7 @@ import MessagesPage from "./pages/Home/MessagesPage.tsx";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute.tsx";
 import { Toaster } from "react-hot-toast";
 import PalsPage from "./pages/Home/PalsPage.tsx";
+import ChatWindow from "./components/ChatWindow/ChatWindow.tsx";
 
 function App() {
 	return (
@@ -43,6 +44,7 @@ function App() {
 						{/* messages page */}
 						{/* map page */}
 					</Route>
+					<Route path="/test/chat" element={<ChatWindow />} />
 				</Route>
 			</Routes>
 			<Toaster
