@@ -149,18 +149,30 @@ export default function ChatWindow() {
 	const [messages, setMessages] = useState<Message[]>([...messagesData]);
 	const [isScrolling, setIsScrolling] = useState(false);
 	const messagesEndRef = useRef<HTMLDivElement>(null);
+	const isFirstRender = useRef(true);
 
-	const scrollToBottom = () => {
+	const scrollToBottom = (smooth = true) => {
 		setIsScrolling(true);
-		messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-		// Reset scrolling state after animation completes
-		setTimeout(() => {
+		messagesEndRef.current?.scrollIntoView({
+			behavior: smooth ? "smooth" : "auto",
+		});
+
+		if (smooth) {
+			setTimeout(() => {
+				setIsScrolling(false);
+			}, 1000);
+		} else {
 			setIsScrolling(false);
-		}, 1000);
+		}
 	};
 
 	useEffect(() => {
-		scrollToBottom();
+		if (isFirstRender.current) {
+			scrollToBottom(false);
+			isFirstRender.current = false;
+		} else {
+			scrollToBottom(true);
+		}
 	}, [messages]);
 
 	return (
