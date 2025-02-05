@@ -1,4 +1,5 @@
 import daisyui from "daisyui";
+import tailwindScrollbarHide from "tailwind-scrollbar-hide";
 
 /** @type {import('tailwindcss').Config} */
 export default {
@@ -64,5 +65,5 @@ export default {
 			},
 		],
 	},
-	plugins: [daisyui],
+	plugins: [daisyui, tailwindScrollbarHide],
 };

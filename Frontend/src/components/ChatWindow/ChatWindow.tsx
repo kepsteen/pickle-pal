@@ -179,7 +179,7 @@ export default function ChatWindow() {
 						<div
 							key={message.timestamp.getTime()}
 							className={cn(
-								"chat",
+								"chat p-2",
 								userId === message.sender ? "chat-end" : "chat-start"
 							)}
 						>
