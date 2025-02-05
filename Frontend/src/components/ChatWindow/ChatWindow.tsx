@@ -147,7 +147,6 @@ const userId = "65a123456789abcdef123456";
 
 export default function ChatWindow() {
 	const [messages, setMessages] = useState<Message[]>([...messagesData]);
-	// Add state to track scrolling
 	const [isScrolling, setIsScrolling] = useState(false);
 	const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -157,7 +156,7 @@ export default function ChatWindow() {
 		// Reset scrolling state after animation completes
 		setTimeout(() => {
 			setIsScrolling(false);
-		}, 1000); // 1000ms matches the default smooth scroll duration
+		}, 1000);
 	};
 
 	useEffect(() => {
