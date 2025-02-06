@@ -179,7 +179,7 @@ export default function ChatWindow() {
 		<>
 			<div
 				className={cn(
-					"w-1/2 overflow-y-auto h-96",
+					"overflow-y-auto scrollbar-hide",
 					// Hide scrollbar during scroll animation
 					isScrolling ? "scrollbar-hide" : ""
 				)}
@@ -196,6 +196,7 @@ export default function ChatWindow() {
 						>
 							<div
 								className={cn(
+									"md:text-lg",
 									userId === message.sender
 										? "chat-bubble chat-bubble-primary"
 										: "chat-bubble"
