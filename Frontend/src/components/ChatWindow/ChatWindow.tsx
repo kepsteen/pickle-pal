@@ -36,7 +36,8 @@ const messagesData: Message[] = [
 	{
 		sender: "65a123456789abcdef123456",
 		reciever: "65a123456789abcdef123457",
-		content: "Building a chat application with React",
+		content:
+			"Building a chat application with ReactBuilding a chat application with ReactBuilding a chat application with ReactBuilding a chat application with ReactBuilding a chat application with ReactBuilding a chat application with ReactBuilding a chat application with React",
 		timestamp: new Date("2024-01-12T10:04:00Z"),
 	},
 	{
@@ -196,7 +197,7 @@ export default function ChatWindow() {
 						>
 							<div
 								className={cn(
-									"md:text-lg",
+									"md:text-lg xl:text-2xl max-w-[75%]",
 									userId === message.sender
 										? "chat-bubble chat-bubble-primary"
 										: "chat-bubble"
