@@ -26,13 +26,13 @@ const Like = mongoose.model("Like", likesSchema);
 const matchesSchema = new mongoose.Schema(
 	{
 		user1: {
-			type: mongoose.Schema.Types.ObjectId,
-			ref: "User",
+			type: String,
+			ref: "InitialUser",
 			required: true,
 		},
 		user2: {
-			type: mongoose.Schema.Types.ObjectId,
-			ref: "User",
+			type: String,
+			ref: "InitialUser",
 			required: true,
 		},
 		timestamp: { type: Date, default: Date.now },

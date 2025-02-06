@@ -1,4 +1,5 @@
 import daisyui from "daisyui";
+import tailwindScrollbarHide from "tailwind-scrollbar-hide";
 
 /** @type {import('tailwindcss').Config} */
 export default {
@@ -6,6 +7,12 @@ export default {
 	theme: {
 		extend: {
 			minHeight: {
+				"main-content": "calc(100vh - 80px)",
+			},
+			maxHeight: {
+				"main-content": "calc(100vh - 80px)",
+			},
+			height: {
 				"main-content": "calc(100vh - 80px)",
 			},
 			colors: {
@@ -58,5 +65,5 @@ export default {
 			},
 		],
 	},
-	plugins: [daisyui],
+	plugins: [daisyui, tailwindScrollbarHide],
 };

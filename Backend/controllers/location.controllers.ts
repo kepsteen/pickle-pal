@@ -72,23 +72,17 @@ export const getNearByUsers = async (req: Request, res: Response) => {
 			.filter((loc) => loc.userId !== null)
 			.map((loc) => loc.userId as unknown as UserDocument);
 
-		console.log("userDocs", userDocs);
-
 		//got nearby users
 		const interactedLikes = await Like.find({
 			liker: userId,
 		}).select("liked");
 
-		console.log("interactedLikes", interactedLikes);
-
 		const interactedUsers = interactedLikes.map((like) => like.liked);
 
-		console.log("interactedUsers", interactedUsers);
 		const filteredUsers = userDocs.filter(
 			(user: UserDocument) => !interactedUsers.includes(user.userId)
 		);
 
-		console.log("filteredUsers", filteredUsers);
 		res.status(200).json(filteredUsers);
 	} catch (error: unknown) {
 		console.error("Get Nearby Users Error:", error);
@@ -98,26 +92,5 @@ export const getNearByUsers = async (req: Request, res: Response) => {
 			error: "Failed to get nearby users",
 			details: errorMessage,
 		});
-	}
-};
-
-export const getNewNearbyUsers = async (req: Request, res: Response) => {
-	try {
-		const { userId } = req.auth;
-		const maxDistance = parseInt(req.query.maxDistance as string) || 16093.4; // Default to 10 miles
-		const lat = parseFloat(req.query.lat as string);
-		const lng = parseFloat(req.query.lng as string);
-
-		const users = await Like.find({
-			likerId: { $ne: userId },
-		}).populate({
-			path: "userId",
-			model: "InitialUser",
-			match: { userId: { $exists: true } },
-			localField: "userId",
-			foreignField: "userId",
-		});
-	} catch (error: unknown) {
-		console.error("Get New Nearby Users Error:", error);
 	}
 };

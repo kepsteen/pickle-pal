@@ -106,7 +106,7 @@ export const addLike = async (req: Request, res: Response) => {
 		const { userId: likerUserId } = req.auth;
 		const { userId: likedUserId } = req.params;
 		const { isLike } = req.body;
-
+		console.log(`${likerUserId} likes ${likedUserId}`);
 		// Find both users to get their MongoDB _id
 		const [likerUser, likedUser] = await Promise.all([
 			User.findOne({ userId: likerUserId }),
@@ -114,8 +114,6 @@ export const addLike = async (req: Request, res: Response) => {
 		]);
 
 		if (!likerUser || !likedUser) {
-			console.log("likerUser", likerUser);
-			console.log("likedUser", likedUser);
 			return res.status(404).json({ error: "One or both users not found" });
 		}
 
@@ -125,6 +123,7 @@ export const addLike = async (req: Request, res: Response) => {
 			liked: likedUser.userId,
 			isLike,
 		});
+		console.log("newLike", newLike);
 
 		// Check if there's a mutual like
 		const mutualLike = await Like.findOne({
@@ -132,17 +131,19 @@ export const addLike = async (req: Request, res: Response) => {
 			liked: likerUser.userId,
 			isLike: true,
 		});
-
+		console.log("mutualLike", mutualLike);
 		if (mutualLike) {
 			// Create a match if there's a mutual like
-			await Match.create({
+			const match = await Match.create({
 				user1: likerUser.userId,
 				user2: likedUser.userId,
 			});
 
+			console.log("match created", match);
+
 			// Get the full user document for the liked user
 			const matchedUser = await User.findOne({ userId: likedUser.userId });
-
+			console.log("matchedUser", matchedUser);
 			return res.status(201).json({
 				like: newLike,
 				isMatch: true,
@@ -158,5 +159,29 @@ export const addLike = async (req: Request, res: Response) => {
 	} catch (error) {
 		console.error("Error adding like", error);
 		res.status(500).json({ error: "Error adding like" });
+	}
+};
+
+export const getPals = async (req: Request, res: Response) => {
+	try {
+		const { userId } = req.auth;
+		const matches = await Match.find({
+			$or: [{ user1: userId }, { user2: userId }],
+		});
+
+		// Get the other user's ID from each match
+		const palIds = matches.map((match) =>
+			match.user1 === userId ? match.user2 : match.user1
+		);
+
+		const pals = await User.find({
+			userId: { $in: palIds },
+		});
+
+		console.log("pals", pals);
+		res.status(200).json(pals);
+	} catch (error) {
+		console.error("Error fetching pals", error);
+		res.status(500).json({ error: "Error fetching pals" });
 	}
 };

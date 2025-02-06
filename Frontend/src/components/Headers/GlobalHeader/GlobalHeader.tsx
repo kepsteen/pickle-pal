@@ -34,7 +34,7 @@ export default function GlobalHeader() {
 								<NavLink
 									to="/pals"
 									className={({ isActive }) =>
-										isActive ? "border border-b-primary" : ""
+										`block p-2 ${isActive ? "border-b-4 border-b-primary" : ""}`
 									}
 								>
 									<Users />
@@ -44,7 +44,7 @@ export default function GlobalHeader() {
 								<NavLink
 									to="/map"
 									className={({ isActive }) =>
-										isActive ? "border border-b-primary" : ""
+										`block p-2 ${isActive ? "border-b-4 border-b-primary" : ""}`
 									}
 								>
 									<MapPinned />
@@ -54,7 +54,7 @@ export default function GlobalHeader() {
 								<NavLink
 									to="/messages"
 									className={({ isActive }) =>
-										isActive ? "border border-b-primary" : ""
+										`block p-2 ${isActive ? "border-b-4 border-b-primary" : ""}`
 									}
 								>
 									<MessageSquare />
@@ -75,7 +75,9 @@ export default function GlobalHeader() {
 						<NavLink
 							to="/settings"
 							className={({ isActive }) =>
-								isActive ? "border border-b-base-content" : ""
+								`block p-2 ${
+									isActive ? "border-b-4 border-b-base-content" : ""
+								}`
 							}
 						>
 							<UserCog />

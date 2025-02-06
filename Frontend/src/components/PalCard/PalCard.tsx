@@ -1,5 +1,5 @@
 import { cn } from "../../lib/utils";
-import { ProfileData } from "../../types/profileSchema";
+import { ProfileData } from "../../types/user.types";
 import { Badge } from "../Badge/Badge";
 import { Card, CardContent, CardTitle } from "../Card/Card";
 import { motion } from "framer-motion";
