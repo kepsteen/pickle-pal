@@ -10,7 +10,7 @@ import { clerkMiddleware, requireAuth, AuthObject } from "@clerk/express";
 import { locationsRouter } from "./routes/location.js";
 import { Server } from "socket.io";
 import http from "http";
-
+import Message from "./models/messages.model.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -72,11 +72,17 @@ io.on("connection", (socket) => {
 		console.log("User disconnected");
 	});
 
-	// Add your custom socket events here
-	// Example:
-	socket.on("message", (data) => {
-		// Handle message
-		io.emit("message", data); // Broadcast to all connected clients
+	socket.on("message", async (data) => {
+		console.log("Received message:", data);
+		const message = await Message.create({
+			sender: socket.id,
+			reciever: data.recieverId,
+			content: data.content,
+		});
+
+		console.log("Message created:", message);
+		// Add chat message to the database
+		io.emit("message", data);
 	});
 });
 

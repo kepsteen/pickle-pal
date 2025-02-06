@@ -24,8 +24,7 @@ export default function MessagesPage() {
 				throw new Error(`Request failed: ${errorData}`);
 			}
 
-			const data = await response.json();
-			console.log("data", data);
+			await response.json();
 		} catch (error) {
 			console.error("Error fetching messages:", error);
 		}

@@ -66,9 +66,6 @@ export const addLike = async (
 	token: string | null
 ): Promise<AddLikeResponse | undefined> => {
 	if (token === null) return;
-	console.log("userId", userId);
-	console.log("isLike", isLike);
-	console.log("token", token);
 	try {
 		const response = await fetch(`/api/users/${userId}/likes`, {
 			method: "POST",

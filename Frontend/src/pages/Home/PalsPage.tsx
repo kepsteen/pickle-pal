@@ -11,80 +11,6 @@ import { Input } from "../../components/Input/Input.tsx";
 import Button from "../../components/Button/Button.tsx";
 import { cn } from "../../lib/utils.ts";
 import ChatWindow from "../../components/ChatWindow/ChatWindow.tsx";
-// const pals = [
-// 	{
-// 		palId: "1",
-// 		name: "Ben Johns",
-// 		imageUrl:
-// 			"https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp",
-// 	},
-// 	{
-// 		palId: "2",
-// 		name: "John Doe",
-// 		imageUrl:
-// 			"https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp",
-// 	},
-// 	{
-// 		palId: "3",
-// 		name: "Anna Smith",
-// 		imageUrl:
-// 			"https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp",
-// 	},
-// 	{
-// 		palId: "4",
-// 		name: "Riley Johnson",
-// 		imageUrl:
-// 			"https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp",
-// 	},
-// 	{
-// 		palId: "5",
-// 		name: "Sam Wilson",
-// 		imageUrl:
-// 			"https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp",
-// 	},
-// 	{
-// 		palId: "6",
-// 		name: "Taylor Swift",
-// 		imageUrl:
-// 			"https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp",
-// 	},
-// 	{
-// 		palId: "7",
-// 		name: "Chris Evans",
-// 		imageUrl:
-// 			"https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp",
-// 	},
-// 	{
-// 		palId: "8",
-// 		name: "Emma Watson",
-// 		imageUrl:
-// 			"https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp",
-// 	},
-// 	{
-// 		palId: "9",
-// 		name: "Michael Jordan",
-// 		imageUrl:
-// 			"https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp",
-// 	},
-// 	{
-// 		palId: "10",
-// 		name: "Sarah Parker",
-// 		imageUrl:
-// 			"https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp",
-// 	},
-// 	{
-// 		palId: "11",
-// 		name: "David Miller",
-// 		imageUrl:
-// 			"https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp",
-// 	},
-// 	{
-// 		palId: "12",
-// 		name: "Jessica Alba",
-// 		imageUrl:
-// 			"https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp",
-// 	},
-// ];
 
 export default function PalsPage() {
 	const [pals, setPals] = useState<ProfileData[]>([]);
@@ -95,8 +21,6 @@ export default function PalsPage() {
 	useEffect(() => {
 		setIsChatOpen(!!userId);
 	}, [userId]);
-
-	console.log("pals", pals);
 
 	const query = useQuery({
 		queryKey: ["pals", token, userId],

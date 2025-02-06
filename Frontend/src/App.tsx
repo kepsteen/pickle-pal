@@ -12,6 +12,7 @@ import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute.tsx";
 import { Toaster } from "react-hot-toast";
 import PalsPage from "./pages/Home/PalsPage.tsx";
 import ChatWindow from "./components/ChatWindow/ChatWindow.tsx";
+import TestSocketIO from "./pages/TestSocketIOPage.tsx";
 
 function App() {
 	return (
@@ -45,6 +46,7 @@ function App() {
 						{/* map page */}
 					</Route>
 					<Route path="/test/chat" element={<ChatWindow />} />
+					<Route path="/test/socket" element={<TestSocketIO />} />
 				</Route>
 			</Routes>
 			<Toaster

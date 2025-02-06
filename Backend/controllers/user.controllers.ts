@@ -178,7 +178,6 @@ export const getPals = async (req: Request, res: Response) => {
 			userId: { $in: palIds },
 		});
 
-		console.log("pals", pals);
 		res.status(200).json(pals);
 	} catch (error) {
 		console.error("Error fetching pals", error);
