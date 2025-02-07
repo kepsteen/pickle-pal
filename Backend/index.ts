@@ -56,7 +56,6 @@ app.get(
 	async (req: Request, res: Response) => {
 		try {
 			const { userId } = req.auth;
-			console.log("userId", userId);
 			res.status(200).json({ userId });
 		} catch (error) {
 			res.status(500).json({ error: "Internal Server Error" });
@@ -66,22 +65,17 @@ app.get(
 
 // Socket.IO connection handling
 io.on("connection", (socket) => {
-	console.log("A user connected");
-
 	socket.on("join-chat", ({ userId, palId }) => {
 		const roomId = [userId, palId].sort().join("_") + "-chat";
 		socket.join(roomId);
-		console.log(`User ${userId} joined room ${roomId}`);
 	});
 
 	socket.on("leave-chat", ({ userId, palId }) => {
 		const roomId = [userId, palId].sort().join("_") + "-chat";
 		socket.leave(roomId);
-		console.log(`User ${userId} left room ${roomId}`);
 	});
 
 	socket.on("message", async (data) => {
-		console.log("Received message:", data);
 		try {
 			const message = await Message.create({
 				sender: data.sender,
@@ -89,7 +83,7 @@ io.on("connection", (socket) => {
 				content: data.content,
 			});
 		} catch (error) {
-			console.log("Error creating message:", error);
+			console.error("Error creating message:", error);
 		}
 		// Add chat message to the database
 		io.emit("messageResponse", data);

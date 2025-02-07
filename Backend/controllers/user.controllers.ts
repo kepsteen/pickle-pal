@@ -106,7 +106,6 @@ export const addLike = async (req: Request, res: Response) => {
 		const { userId: likerUserId } = req.auth;
 		const { userId: likedUserId } = req.params;
 		const { isLike } = req.body;
-		console.log(`${likerUserId} likes ${likedUserId}`);
 		// Find both users to get their MongoDB _id
 		const [likerUser, likedUser] = await Promise.all([
 			User.findOne({ userId: likerUserId }),
@@ -123,7 +122,6 @@ export const addLike = async (req: Request, res: Response) => {
 			liked: likedUser.userId,
 			isLike,
 		});
-		console.log("newLike", newLike);
 
 		// Check if there's a mutual like
 		const mutualLike = await Like.findOne({
@@ -131,7 +129,6 @@ export const addLike = async (req: Request, res: Response) => {
 			liked: likerUser.userId,
 			isLike: true,
 		});
-		console.log("mutualLike", mutualLike);
 		if (mutualLike) {
 			// Create a match if there's a mutual like
 			const match = await Match.create({
@@ -139,11 +136,8 @@ export const addLike = async (req: Request, res: Response) => {
 				user2: likedUser.userId,
 			});
 
-			console.log("match created", match);
-
 			// Get the full user document for the liked user
 			const matchedUser = await User.findOne({ userId: likedUser.userId });
-			console.log("matchedUser", matchedUser);
 			return res.status(201).json({
 				like: newLike,
 				isMatch: true,
@@ -188,7 +182,6 @@ export const getPals = async (req: Request, res: Response) => {
 export const getMessages = async (req: Request, res: Response) => {
 	try {
 		const { palId } = req.params;
-		console.log("palId", palId);
 		const { userId } = req.auth;
 		const messages = await Message.find({
 			$or: [
