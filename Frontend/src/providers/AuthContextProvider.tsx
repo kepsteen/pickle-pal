@@ -4,6 +4,7 @@ import {
 	useContext,
 	useEffect,
 	useState,
+	useCallback,
 } from "react";
 import {
 	useAuth as useClerkAuth,
@@ -16,9 +17,11 @@ import { ActiveSessionResource, UserResource } from "@clerk/types";
 type AuthContextType = {
 	user: UserResource | null;
 	session: ActiveSessionResource | null;
-	isSignedIn: boolean | undefined;
+	isSignedIn: boolean;
 	isLoaded: boolean;
 	token: string | null;
+	// Add optional methods that might be useful
+	refreshToken?: () => Promise<void>;
 };
 
 // Now create the context with a more accurate initial state
@@ -31,33 +34,56 @@ type AuthContextProviderProps = {
 
 export function AuthContextProvider({ children }: AuthContextProviderProps) {
 	const [token, setToken] = useState<string | null>(null);
+	const [isLoadingToken, setIsLoadingToken] = useState(true);
 
 	const { isLoaded, isSignedIn, getToken } = useClerkAuth();
 	const { user } = useUser();
 	const { session } = useSession();
 
+	const fetchToken = useCallback(async () => {
+		try {
+			setIsLoadingToken(true);
+			if (isSignedIn) {
+				const newToken = await getToken();
+				setToken(newToken);
+			} else {
+				setToken(null);
+			}
+		} catch (error) {
+			console.error("Error fetching token:", error);
+			setToken(null);
+		} finally {
+			setIsLoadingToken(false);
+		}
+	}, [getToken, isSignedIn]);
+
 	useEffect(() => {
-		const fetchToken = async () => {
-			const token = await getToken();
-			setToken(token);
-		};
 		fetchToken();
-	}, [getToken, user]);
+	}, [fetchToken]);
+
+	const refreshToken = useCallback(async () => {
+		await fetchToken();
+	}, [fetchToken]);
 
 	const authValue: AuthContextType = {
-		isLoaded,
+		isLoaded: isLoaded && !isLoadingToken,
 		isSignedIn: isSignedIn ?? false,
 		user: user ?? null,
 		session: session ?? null,
 		token,
+		refreshToken,
 	};
+
+	if (!isLoaded || isLoadingToken) {
+		return null;
+	}
 
 	return (
 		<AuthContext.Provider value={authValue}>{children}</AuthContext.Provider>
 	);
 }
 
-// Add this custom hook
+// Custom hook to use the AuthContext
 // eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
 	const context = useContext(AuthContext);

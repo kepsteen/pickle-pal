@@ -13,14 +13,22 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { cn } from "../../lib/utils";
 import { PasswordInput } from "../../components/PasswordInput/PasswordInput";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 type LoginFormData = {
 	email: string;
 	password: string;
 };
 
+const loginSchema = z.object({
+	email: z.string().email("Please enter a valid email address"),
+	password: z.string().min(8, "Password must be at least 8 characters"),
+});
+
 export default function LoginPage() {
 	const [isPending, setIsPending] = useState(false);
+	const [signInError, setSignInError] = useState<string | null>(null);
 
 	const navigate = useNavigate();
 
@@ -29,12 +37,17 @@ export default function LoginPage() {
 		register,
 		handleSubmit,
 		formState: { errors },
-	} = useForm<LoginFormData>();
+		setError,
+	} = useForm<LoginFormData>({
+		resolver: zodResolver(loginSchema),
+	});
 
 	const { setActive } = useClerk();
 
 	async function onSubmit(data: LoginFormData) {
 		setIsPending(true);
+		setSignInError(null);
+
 		try {
 			const signInResult = await signIn?.create({
 				identifier: data.email,
@@ -42,15 +55,31 @@ export default function LoginPage() {
 				password: data.password,
 			});
 
-			if (signInResult?.status === "complete") {
-				// Need to set the active session so isSigned -> true
+			if (!signInResult) {
+				throw new Error("Sign in failed - no result returned");
+			}
+
+			if (signInResult.status === "complete") {
 				await setActive({
 					session: signInResult.createdSessionId,
 				});
 				navigate("/home");
+			} else {
+				setSignInError("Sign in could not be completed. Please try again.");
 			}
-		} catch (error) {
+		} catch (err) {
+			const error = err as Error;
 			console.error("Error signing in", error);
+
+			if (error.message?.includes("Invalid email")) {
+				setError("email", { message: "Invalid email address" });
+			} else if (error.message?.includes("Invalid password")) {
+				setError("password", { message: "Invalid password" });
+			} else {
+				setSignInError(
+					"Failed to sign in. Please check your credentials and try again."
+				);
+			}
 		} finally {
 			setIsPending(false);
 		}
@@ -93,12 +122,16 @@ export default function LoginPage() {
 								<span className="text-error">{errors.password.message}</span>
 							)}
 						</Label>
+						{signInError && (
+							<div className="text-sm text-error">{signInError}</div>
+						)}
 						<Button
 							variant="primary"
 							shape="block"
 							className={cn("mt-2", isPending ? "btn-disabled" : "")}
+							disabled={isPending}
 						>
-							Login
+							{isPending ? "Signing in..." : "Login"}
 						</Button>
 					</form>
 					<p>
