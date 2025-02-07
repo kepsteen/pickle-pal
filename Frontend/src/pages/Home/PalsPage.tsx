@@ -1,106 +1,33 @@
 import { useQuery } from "@tanstack/react-query";
 import PalCardCondensed from "../../components/PalCardCondensed/PalCardCondensed";
 import { getPals } from "../../lib/api";
-import { useAuth } from "../../providers/AuthContextProvider.tsx";
 import { useState, useEffect } from "react";
 import { ProfileData } from "../../types/user.types.ts";
 import { NavLink, useParams } from "react-router";
 import { ChevronLeft, EllipsisVerticalIcon } from "lucide-react";
-import Label from "../../components/Label/Label.tsx";
-import { Input } from "../../components/Input/Input.tsx";
-import Button from "../../components/Button/Button.tsx";
 import { cn } from "../../lib/utils.ts";
 import ChatWindow from "../../components/ChatWindow/ChatWindow.tsx";
-// const pals = [
-// 	{
-// 		palId: "1",
-// 		name: "Ben Johns",
-// 		imageUrl:
-// 			"https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp",
-// 	},
-// 	{
-// 		palId: "2",
-// 		name: "John Doe",
-// 		imageUrl:
-// 			"https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp",
-// 	},
-// 	{
-// 		palId: "3",
-// 		name: "Anna Smith",
-// 		imageUrl:
-// 			"https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp",
-// 	},
-// 	{
-// 		palId: "4",
-// 		name: "Riley Johnson",
-// 		imageUrl:
-// 			"https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp",
-// 	},
-// 	{
-// 		palId: "5",
-// 		name: "Sam Wilson",
-// 		imageUrl:
-// 			"https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp",
-// 	},
-// 	{
-// 		palId: "6",
-// 		name: "Taylor Swift",
-// 		imageUrl:
-// 			"https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp",
-// 	},
-// 	{
-// 		palId: "7",
-// 		name: "Chris Evans",
-// 		imageUrl:
-// 			"https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp",
-// 	},
-// 	{
-// 		palId: "8",
-// 		name: "Emma Watson",
-// 		imageUrl:
-// 			"https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp",
-// 	},
-// 	{
-// 		palId: "9",
-// 		name: "Michael Jordan",
-// 		imageUrl:
-// 			"https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp",
-// 	},
-// 	{
-// 		palId: "10",
-// 		name: "Sarah Parker",
-// 		imageUrl:
-// 			"https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp",
-// 	},
-// 	{
-// 		palId: "11",
-// 		name: "David Miller",
-// 		imageUrl:
-// 			"https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp",
-// 	},
-// 	{
-// 		palId: "12",
-// 		name: "Jessica Alba",
-// 		imageUrl:
-// 			"https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp",
-// 	},
-// ];
+import { Socket } from "socket.io-client";
+import { ClientToServerEvents, ServerToClientEvents } from "../../socket.ts";
+import { useAuth } from "@clerk/clerk-react";
 
-export default function PalsPage() {
+interface PalsPageProps {
+	socket: Socket<ServerToClientEvents, ClientToServerEvents>;
+}
+export default function PalsPage({ socket }: PalsPageProps) {
 	const [pals, setPals] = useState<ProfileData[]>([]);
 	const [isChatOpen, setIsChatOpen] = useState(false);
 	const { userId } = useParams();
-	const { token } = useAuth();
+	const { getToken } = useAuth();
 
 	useEffect(() => {
 		setIsChatOpen(!!userId);
 	}, [userId]);
 
-	console.log("pals", pals);
-
 	const query = useQuery({
-		queryKey: ["pals", token, userId],
+		queryKey: ["pals", userId],
 		queryFn: async () => {
+			const token = await getToken();
 			if (!token) return [];
 			const data = await getPals(token);
 			if (data) {
@@ -108,7 +35,9 @@ export default function PalsPage() {
 			}
 			return data ?? [];
 		},
-		enabled: !!token,
+		refetchOnMount: true,
+		retry: 3,
+		staleTime: 0,
 	});
 
 	if (query.isLoading) return <div>Loading...</div>;
@@ -179,19 +108,7 @@ export default function PalsPage() {
 								<EllipsisVerticalIcon className="w-6 h-6 text-primary" />
 							</div>
 						))}
-					<ChatWindow />
-					<div className="flex items-center gap-2 px-4 py-4 border-t-4 border-t-base-200">
-						<Label>
-							<Input
-								name="message"
-								type="text"
-								placeholder="Message"
-								variant="accent"
-								className="border-4 border-base-200"
-							/>
-						</Label>
-						<Button className="p-1">Send</Button>
-					</div>
+					<ChatWindow palId={userId} socket={socket} />
 				</section>
 			)}
 		</div>

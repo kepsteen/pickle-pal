@@ -8,12 +8,21 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { clerkMiddleware, requireAuth, AuthObject } from "@clerk/express";
 import { locationsRouter } from "./routes/location.js";
-
+import { Server } from "socket.io";
+import http from "http";
+import Message from "./models/messages.model.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
 const port = 3000;
+const server = http.createServer(app);
+const io = new Server(server, {
+	cors: {
+		origin: "*", // Configure this according to your needs
+		methods: ["GET", "POST"],
+	},
+});
 
 // Middleware
 app.use(cors());
@@ -47,7 +56,6 @@ app.get(
 	async (req: Request, res: Response) => {
 		try {
 			const { userId } = req.auth;
-			console.log("userId", userId);
 			res.status(200).json({ userId });
 		} catch (error) {
 			res.status(500).json({ error: "Internal Server Error" });
@@ -55,13 +63,44 @@ app.get(
 	}
 );
 
+// Socket.IO connection handling
+io.on("connection", (socket) => {
+	socket.on("join-chat", ({ userId, palId }) => {
+		const roomId = [userId, palId].sort().join("_") + "-chat";
+		socket.join(roomId);
+	});
+
+	socket.on("leave-chat", ({ userId, palId }) => {
+		const roomId = [userId, palId].sort().join("_") + "-chat";
+		socket.leave(roomId);
+	});
+
+	socket.on("message", async (data) => {
+		try {
+			const message = await Message.create({
+				sender: data.sender,
+				reciever: data.reciever,
+				content: data.content,
+			});
+		} catch (error) {
+			console.error("Error creating message:", error);
+		}
+		// Add chat message to the database
+		io.emit("messageResponse", data);
+	});
+
+	socket.on("disconnect", () => {
+		console.log("User disconnected");
+	});
+});
+
 // Serve index.html for all other routes (for client-side routing)
 app.get("*", (req, res) => {
 	res.sendFile(path.join(__dirname, "../Frontend/dist/index.html"));
 });
 
 connectDB().then(() => {
-	app.listen(port, "0.0.0.0", () =>
+	server.listen(port, "0.0.0.0", () =>
 		console.log(`Server running on port ${port}`)
 	);
 });

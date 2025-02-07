@@ -54,7 +54,6 @@ export default function HomePage() {
 		},
 	});
 
-	// Move this before the if statements
 	const swipeMutation = useMutation({
 		mutationKey: ["swipe", token, profiles?.[0]?.userId, token],
 		mutationFn: async (isLike: boolean) => {
@@ -63,7 +62,6 @@ export default function HomePage() {
 			if (data?.isMatch) {
 				toast(<MatchToast name={data.matchedUser!.firstName} />);
 			}
-			console.log("data", data);
 			return data;
 		},
 	});
