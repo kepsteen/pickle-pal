@@ -68,21 +68,23 @@ app.get(
 io.on("connection", (socket) => {
 	console.log("A user connected");
 
-	socket.on("disconnect", () => {
-		console.log("User disconnected");
-	});
-
 	socket.on("message", async (data) => {
 		console.log("Received message:", data);
-		const message = await Message.create({
-			sender: socket.id,
-			reciever: data.recieverId,
-			content: data.content,
-		});
-
-		console.log("Message created:", message);
+		try {
+			const message = await Message.create({
+				sender: data.sender,
+				reciever: data.reciever,
+				content: data.content,
+			});
+		} catch (error) {
+			console.log("Error creating message:", error);
+		}
 		// Add chat message to the database
-		io.emit("message", data);
+		io.emit("messageResponse", data);
+	});
+
+	socket.on("disconnect", () => {
+		console.log("User disconnected");
 	});
 });
 

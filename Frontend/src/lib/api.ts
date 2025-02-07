@@ -101,3 +101,10 @@ export async function getPals(token: string | null) {
 		console.error("Error fetching pals:", error);
 	}
 }
+
+export async function getMessages(token: string | null, palId: string) {
+	if (token === null) return [];
+	try {
+		
+	}
+}

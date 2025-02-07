@@ -11,8 +11,8 @@ import MessagesPage from "./pages/Home/MessagesPage.tsx";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute.tsx";
 import { Toaster } from "react-hot-toast";
 import PalsPage from "./pages/Home/PalsPage.tsx";
-import ChatWindow from "./components/ChatWindow/ChatWindow.tsx";
 import TestSocketIO from "./pages/TestSocketIOPage.tsx";
+import { socket } from "./socket.ts";
 
 function App() {
 	return (
@@ -41,11 +41,13 @@ function App() {
 					>
 						<Route path="home" element={<HomePage />} />
 						<Route path="messages" element={<MessagesPage />} />
-						<Route path="pals/:userId?" element={<PalsPage />} />
+						<Route
+							path="pals/:userId?"
+							element={<PalsPage socket={socket} />}
+						/>
 						{/* messages page */}
 						{/* map page */}
 					</Route>
-					<Route path="/test/chat" element={<ChatWindow />} />
 					<Route path="/test/socket" element={<TestSocketIO />} />
 				</Route>
 			</Routes>

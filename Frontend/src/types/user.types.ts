@@ -55,3 +55,9 @@ export interface AddLikeResponse {
 	isMatch: boolean;
 	matchedUser: User | null;
 }
+export interface Message {
+	sender: string;
+	reciever: string;
+	content: string;
+	timestamp: Date;
+}

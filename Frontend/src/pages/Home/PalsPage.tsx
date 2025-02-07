@@ -6,13 +6,16 @@ import { useState, useEffect } from "react";
 import { ProfileData } from "../../types/user.types.ts";
 import { NavLink, useParams } from "react-router";
 import { ChevronLeft, EllipsisVerticalIcon } from "lucide-react";
-import Label from "../../components/Label/Label.tsx";
-import { Input } from "../../components/Input/Input.tsx";
-import Button from "../../components/Button/Button.tsx";
+
 import { cn } from "../../lib/utils.ts";
 import ChatWindow from "../../components/ChatWindow/ChatWindow.tsx";
+import { Socket } from "socket.io-client";
+import { ClientToServerEvents, ServerToClientEvents } from "../../socket.ts";
 
-export default function PalsPage() {
+interface PalsPageProps {
+	socket: Socket<ServerToClientEvents, ClientToServerEvents>;
+}
+export default function PalsPage({ socket }: PalsPageProps) {
 	const [pals, setPals] = useState<ProfileData[]>([]);
 	const [isChatOpen, setIsChatOpen] = useState(false);
 	const { userId } = useParams();
@@ -103,19 +106,7 @@ export default function PalsPage() {
 								<EllipsisVerticalIcon className="w-6 h-6 text-primary" />
 							</div>
 						))}
-					<ChatWindow />
-					<div className="flex items-center gap-2 px-4 py-4 border-t-4 border-t-base-200">
-						<Label>
-							<Input
-								name="message"
-								type="text"
-								placeholder="Message"
-								variant="accent"
-								className="border-4 border-base-200"
-							/>
-						</Label>
-						<Button className="p-1">Send</Button>
-					</div>
+					<ChatWindow palId={userId} socket={socket} />
 				</section>
 			)}
 		</div>
