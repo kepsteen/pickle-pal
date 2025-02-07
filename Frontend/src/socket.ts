@@ -24,6 +24,8 @@ export interface ClientToServerEvents {
 		content: string;
 		timestamp: Date;
 	}) => void;
+	"join-chat": (data: { userId: string; palId: string }) => void;
+	"leave-chat": (data: { userId: string; palId: string }) => void;
 }
 
 export interface InterServerEvents {

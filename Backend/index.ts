@@ -68,6 +68,18 @@ app.get(
 io.on("connection", (socket) => {
 	console.log("A user connected");
 
+	socket.on("join-chat", ({ userId, palId }) => {
+		const roomId = [userId, palId].sort().join("_") + "-chat";
+		socket.join(roomId);
+		console.log(`User ${userId} joined room ${roomId}`);
+	});
+
+	socket.on("leave-chat", ({ userId, palId }) => {
+		const roomId = [userId, palId].sort().join("_") + "-chat";
+		socket.leave(roomId);
+		console.log(`User ${userId} left room ${roomId}`);
+	});
+
 	socket.on("message", async (data) => {
 		console.log("Received message:", data);
 		try {

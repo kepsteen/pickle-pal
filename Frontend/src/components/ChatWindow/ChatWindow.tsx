@@ -9,6 +9,8 @@ import { ClientToServerEvents } from "../../socket";
 import { Socket } from "socket.io-client";
 import { ServerToClientEvents } from "../../socket";
 import { Message } from "../../types/user.types";
+import { useQuery } from "@tanstack/react-query";
+import { getMessages } from "../../lib/api";
 
 interface ChatWindowProps {
 	palId: string;
@@ -21,7 +23,7 @@ export default function ChatWindow({ palId, socket }: ChatWindowProps) {
 	const messagesEndRef = useRef<HTMLDivElement>(null);
 	const isFirstRender = useRef(true);
 	const [inputMessage, setInputMessage] = useState("");
-	const { user } = useAuth();
+	const { user, token } = useAuth();
 
 	useEffect(() => {
 		if (isFirstRender.current) {
@@ -33,14 +35,39 @@ export default function ChatWindow({ palId, socket }: ChatWindowProps) {
 	}, [messages]);
 
 	useEffect(() => {
+		// Cleanup any existing connections first
+		socket.off("messageResponse");
+
+		// Join the specific chat room only if not already in it
+		if (user?.id) {
+			socket.emit("join-chat", { userId: user.id, palId });
+		}
+
 		socket.on("messageResponse", (data: Message) => {
 			console.log("type of timestamp", typeof data.timestamp);
-			setMessages([...messages, data]);
+			setMessages((prev) => [...prev, data]);
 		});
+
 		return () => {
-			socket.off("messageResponse");
+			if (user?.id) {
+				socket.emit("leave-chat", { userId: user.id, palId });
+				socket.off("messageResponse");
+			}
 		};
-	}, [socket, messages]);
+	}, [socket, user?.id, palId]);
+
+	const query = useQuery({
+		queryKey: ["messages", user?.id, palId, token],
+		queryFn: async () => {
+			const data = await getMessages(token, palId);
+			setMessages(data || []);
+			return data;
+		},
+		enabled: !!token,
+		refetchOnMount: true,
+		retry: 3,
+		staleTime: 0,
+	});
 
 	const scrollToBottom = (smooth = true) => {
 		setIsScrolling(true);
@@ -68,6 +95,10 @@ export default function ChatWindow({ palId, socket }: ChatWindowProps) {
 		});
 		setInputMessage("");
 	};
+
+	if (query.isLoading) return <div>Loading...</div>;
+	if (query.isError)
+		return <div>{`Error loading profiles: ${query.error}`}</div>;
 
 	return (
 		<>

@@ -1,4 +1,4 @@
-import { ProfileData } from "../types/user.types";
+import { Message, ProfileData } from "../types/user.types";
 import { AddLikeResponse } from "../types/user.types";
 
 export async function getUsers(currentUserId: string) {
@@ -105,6 +105,14 @@ export async function getPals(token: string | null) {
 export async function getMessages(token: string | null, palId: string) {
 	if (token === null) return [];
 	try {
-		
+		const response = await fetch(`/api/users/${palId}/messages`, {
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		});
+		if (!response.ok) throw new Error("Failed to fetch messages");
+		return (await response.json()) as Message[];
+	} catch (error) {
+		console.error("Error fetching messages:", error);
 	}
 }

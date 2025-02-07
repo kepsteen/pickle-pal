@@ -6,6 +6,7 @@ import {
 	getUsers,
 	addLike,
 	getPals,
+	getMessages,
 } from "../controllers/user.controllers.js";
 import multer from "multer";
 import { requireAuth } from "@clerk/express";
@@ -42,6 +43,9 @@ router.post("/:userId/likes", requireAuth(), addLike);
 
 // Get all pals
 router.get("/pals", requireAuth(), getPals);
+
+// Get messages between two users
+router.get("/:palId/messages", requireAuth(), getMessages);
 
 // Update Settings
 // router.post("/:userId/settings", updateSettings);

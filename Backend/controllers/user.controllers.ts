@@ -4,7 +4,7 @@ import { User } from "../models/profile.model.js";
 import { uploadToS3 } from "../s3/client.js";
 import dotenv from "dotenv";
 import { Like, Match } from "../models/matches.model.js";
-
+import Message from "../models/messages.model.js";
 if (process.env.NODE_ENV === "production") {
 	dotenv.config({ path: "/etc/app.env" });
 } else {
@@ -182,5 +182,24 @@ export const getPals = async (req: Request, res: Response) => {
 	} catch (error) {
 		console.error("Error fetching pals", error);
 		res.status(500).json({ error: "Error fetching pals" });
+	}
+};
+
+export const getMessages = async (req: Request, res: Response) => {
+	try {
+		const { palId } = req.params;
+		console.log("palId", palId);
+		const { userId } = req.auth;
+		const messages = await Message.find({
+			$or: [
+				{ sender: userId, reciever: palId },
+				{ sender: palId, reciever: userId },
+			],
+		});
+
+		res.status(200).json(messages);
+	} catch (error) {
+		console.error("Error fetching messages", error);
+		res.status(500).json({ error: "Error fetching messages" });
 	}
 };

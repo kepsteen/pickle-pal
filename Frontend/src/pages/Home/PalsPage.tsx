@@ -36,6 +36,9 @@ export default function PalsPage({ socket }: PalsPageProps) {
 			return data ?? [];
 		},
 		enabled: !!token,
+		refetchOnMount: true,
+		retry: 3,
+		staleTime: 0,
 	});
 
 	if (query.isLoading) return <div>Loading...</div>;
