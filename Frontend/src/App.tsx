@@ -6,7 +6,7 @@ import SignUpPage from "./pages/Auth/SignUpPage";
 import OnboardingPage from "./pages/Onboarding/OnboardingPage.tsx";
 import HomeLayout from "./layouts/HomeLayout.tsx";
 import HomePage from "./pages/Home/HomePage.tsx";
-import { AuthContextProvider } from "./providers/AuthContextProvider";
+
 import MessagesPage from "./pages/Home/MessagesPage.tsx";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute.tsx";
 import { Toaster } from "react-hot-toast";
@@ -16,7 +16,7 @@ import { socket } from "./socket.ts";
 
 function App() {
 	return (
-		<AuthContextProvider>
+		<>
 			<Routes>
 				<Route path="/" element={<Outlet />}>
 					<Route index element={<LandingPage />} />
@@ -57,7 +57,7 @@ function App() {
 					className: "bg-base-200 py-4 px-6 w-96 cursor-pointer",
 				}}
 			/>
-		</AuthContextProvider>
+		</>
 	);
 }
 

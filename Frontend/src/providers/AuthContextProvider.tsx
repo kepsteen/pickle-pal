@@ -1,3 +1,5 @@
+// No Longer needed
+
 import {
 	createContext,
 	ReactNode,
@@ -21,7 +23,7 @@ type AuthContextType = {
 	isLoaded: boolean;
 	token: string | null;
 	// Add optional methods that might be useful
-	refreshToken?: () => Promise<void>;
+	refreshToken: () => Promise<void>;
 };
 
 // Now create the context with a more accurate initial state
@@ -57,9 +59,25 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
 		}
 	}, [getToken, isSignedIn]);
 
+	// Refresh token periodically
 	useEffect(() => {
+		if (!isSignedIn) return;
+
+		// Initial token fetch
 		fetchToken();
-	}, [fetchToken]);
+
+		// Refresh token every 30 seconds
+		const refreshInterval = setInterval(fetchToken, 30 * 1000);
+
+		return () => clearInterval(refreshInterval);
+	}, [fetchToken, isSignedIn]);
+
+	// Also refresh token when session changes
+	useEffect(() => {
+		if (session) {
+			fetchToken();
+		}
+	}, [session, fetchToken]);
 
 	const refreshToken = useCallback(async () => {
 		await fetchToken();

@@ -4,13 +4,13 @@ import { cn } from "../../lib/utils";
 import Label from "../Label/Label";
 import { Input } from "../Input/Input";
 import Button from "../Button/Button";
-import { useAuth } from "../../providers/AuthContextProvider";
 import { ClientToServerEvents } from "../../socket";
 import { Socket } from "socket.io-client";
 import { ServerToClientEvents } from "../../socket";
 import { Message } from "../../types/user.types";
 import { useQuery } from "@tanstack/react-query";
 import { getMessages } from "../../lib/api";
+import { useAuth, useUser } from "@clerk/clerk-react";
 
 interface ChatWindowProps {
 	palId: string;
@@ -23,7 +23,8 @@ export default function ChatWindow({ palId, socket }: ChatWindowProps) {
 	const messagesEndRef = useRef<HTMLDivElement>(null);
 	const isFirstRender = useRef(true);
 	const [inputMessage, setInputMessage] = useState("");
-	const { user, token } = useAuth();
+	const { user } = useUser();
+	const { getToken } = useAuth();
 
 	useEffect(() => {
 		if (isFirstRender.current) {
@@ -57,13 +58,14 @@ export default function ChatWindow({ palId, socket }: ChatWindowProps) {
 	}, [socket, user?.id, palId]);
 
 	const query = useQuery({
-		queryKey: ["messages", user?.id, palId, token],
+		queryKey: ["messages", user?.id, palId],
 		queryFn: async () => {
+			const token = await getToken();
+			if (!token) return [];
 			const data = await getMessages(token, palId);
 			setMessages(data || []);
 			return data;
 		},
-		enabled: !!token,
 		refetchOnMount: true,
 		retry: 3,
 		staleTime: 0,

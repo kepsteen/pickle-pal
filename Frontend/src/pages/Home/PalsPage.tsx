@@ -1,16 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 import PalCardCondensed from "../../components/PalCardCondensed/PalCardCondensed";
 import { getPals } from "../../lib/api";
-import { useAuth } from "../../providers/AuthContextProvider.tsx";
 import { useState, useEffect } from "react";
 import { ProfileData } from "../../types/user.types.ts";
 import { NavLink, useParams } from "react-router";
 import { ChevronLeft, EllipsisVerticalIcon } from "lucide-react";
-
 import { cn } from "../../lib/utils.ts";
 import ChatWindow from "../../components/ChatWindow/ChatWindow.tsx";
 import { Socket } from "socket.io-client";
 import { ClientToServerEvents, ServerToClientEvents } from "../../socket.ts";
+import { useAuth } from "@clerk/clerk-react";
 
 interface PalsPageProps {
 	socket: Socket<ServerToClientEvents, ClientToServerEvents>;
@@ -19,15 +18,16 @@ export default function PalsPage({ socket }: PalsPageProps) {
 	const [pals, setPals] = useState<ProfileData[]>([]);
 	const [isChatOpen, setIsChatOpen] = useState(false);
 	const { userId } = useParams();
-	const { token } = useAuth();
+	const { getToken } = useAuth();
 
 	useEffect(() => {
 		setIsChatOpen(!!userId);
 	}, [userId]);
 
 	const query = useQuery({
-		queryKey: ["pals", token, userId],
+		queryKey: ["pals", userId],
 		queryFn: async () => {
+			const token = await getToken();
 			if (!token) return [];
 			const data = await getPals(token);
 			if (data) {
@@ -35,7 +35,6 @@ export default function PalsPage({ socket }: PalsPageProps) {
 			}
 			return data ?? [];
 		},
-		enabled: !!token,
 		refetchOnMount: true,
 		retry: 3,
 		staleTime: 0,
