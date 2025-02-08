@@ -54,6 +54,7 @@ export default function HomePage() {
 			return data;
 		},
 		enabled: !!position,
+		refetchOnMount: true,
 	});
 
 	const swipeMutation = useMutation({
