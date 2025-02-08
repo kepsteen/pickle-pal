@@ -6,13 +6,12 @@ import SignUpPage from "./pages/Auth/SignUpPage";
 import OnboardingPage from "./pages/Onboarding/OnboardingPage.tsx";
 import HomeLayout from "./layouts/HomeLayout.tsx";
 import HomePage from "./pages/Home/HomePage.tsx";
-
-import MessagesPage from "./pages/Home/MessagesPage.tsx";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute.tsx";
 import { Toaster } from "react-hot-toast";
 import PalsPage from "./pages/Home/PalsPage.tsx";
 import TestSocketIO from "./pages/TestSocketIOPage.tsx";
 import { socket } from "./socket.ts";
+import PairSwipePage from "./pages/Home/PairSwipePage.tsx";
 
 function App() {
 	return (
@@ -40,10 +39,13 @@ function App() {
 						}
 					>
 						<Route path="home" element={<HomePage />} />
-						<Route path="messages" element={<MessagesPage />} />
 						<Route
 							path="pals/:userId?"
 							element={<PalsPage socket={socket} />}
+						/>
+						<Route
+							path="pair-swipe"
+							element={<PairSwipePage socket={socket} />}
 						/>
 						{/* messages page */}
 						{/* map page */}
