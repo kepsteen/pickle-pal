@@ -1,4 +1,5 @@
 import {
+	Home,
 	// MapPinned,
 	MessageSquare,
 	// SlidersHorizontal,
@@ -50,6 +51,16 @@ export default function GlobalHeader() {
 									<MapPinned />
 								</NavLink>
 							</li> */}
+							<li>
+								<NavLink
+									to="/home"
+									className={({ isActive }) =>
+										`block p-2 ${isActive ? "border-b-4 border-b-primary" : ""}`
+									}
+								>
+									<Home />
+								</NavLink>
+							</li>
 							<li>
 								<NavLink
 									to="/pals"
