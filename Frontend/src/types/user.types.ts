@@ -28,7 +28,7 @@ export type ProfileData = {
 	firstName: string;
 	skillLevel: "Beginner" | "Intermediate" | "Advanced";
 	playStyle: "Dinker" | "Hybrid" | "Banger";
-	lookingFor: [string];
+	lookingFor: string[];
 	duprRating: number;
 	bio: string;
 	profileImageUrl: string;

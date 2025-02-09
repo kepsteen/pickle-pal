@@ -50,9 +50,16 @@ export default function PalCard({
 				x: swipeDirection === "left" ? -200 : 200,
 				transition: { duration: 0.1 },
 			}}
+			whileHover={{ scale: 1.05 }}
+			transition={{ duration: 0.2 }}
 		>
-			<Card className={cn("mx-4 rounded-b-md w-[500px]", className)}>
-				<CardTitle className="bg-base-200 rounded-t-md">
+			<Card
+				className={cn(
+					"mx-4 rounded-b-md w-[500px] transition-all duration-200 shadow-pal-card",
+					className
+				)}
+			>
+				<CardTitle className="pt-4 bg-base-200 rounded-t-md">
 					<div className="flex items-center gap-2">
 						<h1 className="text-3xl font-semibold">{profile.firstName}</h1>
 						<Badge
@@ -63,27 +70,40 @@ export default function PalCard({
 						</Badge>
 					</div>
 				</CardTitle>
-				<CardContent className="flex flex-col bg-base-200 rounded-b-md">
-					<div className="flex-shrink-0 w-full mb-4 h-96">
+				<CardContent className="flex flex-col gap-4 pt-4 bg-base-200 rounded-b-md">
+					<div className="flex-shrink-0 w-full h-56">
 						<img
 							src={profile.profileImageUrl}
 							alt={`${profile.firstName}'s profile picture`}
 							className="object-cover object-top w-full h-full rounded-md"
 						/>
 					</div>
-					<h2 className="flex-shrink-0 font-semibold">Playstyle</h2>
-					<Badge
-						variant="outline"
-						size="md"
-						className="flex-shrink-0 px-4 border-info text-info"
-					>
-						{profile.playStyle}
-					</Badge>
-					<h2 className="flex-shrink-0 font-semibold">Looking For</h2>
-					<div className="flex flex-wrap flex-shrink-0 h-12 gap-2">
-						{profile.lookingFor.map((item) => renderLookingForBadge(item))}
+					<div>
+						<h2 className="flex-shrink-0 font-semibold">Playstyle</h2>
+						<Badge
+							variant="outline"
+							size="md"
+							className="flex-shrink-0 px-4 border-info text-info"
+						>
+							{profile.playStyle}
+						</Badge>
+					</div>
+					<div>
+						<h2 className="flex-shrink-0 font-semibold">Looking For</h2>
+						<div className="flex flex-wrap flex-shrink-0 gap-2">
+							{profile.lookingFor.map((item) => renderLookingForBadge(item))}
+						</div>
+					</div>
+					<div>
+						<h2 className="flex-shrink-0 font-semibold">Bio</h2>
+						<p className="text-muted">{profile.bio}</p>
 					</div>
 				</CardContent>
+				<div className="p-4 bg-base-300 rounded-b-md">
+					<h2 className="flex-shrink-0 px-4 font-semibold">
+						DUPR <span className="pl-2 text-primary">{profile.duprRating}</span>
+					</h2>
+				</div>
 			</Card>
 		</motion.div>
 	);
