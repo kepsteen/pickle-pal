@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { formatUserImageName } from "../lib/utils.js";
+import { formatUserImageName } from "../../lib/utils.js";
 import { User } from "../models/profile.model.js";
-import { uploadToS3 } from "../s3/client.js";
+import { uploadToS3 } from "../../s3/client.js";
 import dotenv from "dotenv";
 import { Like, Match } from "../models/matches.model.js";
 import Message from "../models/messages.model.js";

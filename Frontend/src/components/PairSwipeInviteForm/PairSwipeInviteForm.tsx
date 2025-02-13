@@ -39,8 +39,8 @@ export default function PairSwipeInviteForm() {
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		const formData = new FormData(e.target as HTMLFormElement);
-		const palName = formData.get("swipe-name");
-		console.log("palId", palName);
+		const palId = formData.get("invite-palId");
+		console.log("palId", palId);
 	};
 	return (
 		<section className="p-4">
@@ -50,7 +50,7 @@ export default function PairSwipeInviteForm() {
 						<Label>
 							<span>Invite a Pal to swipe with you</span>
 							<Select
-								name="swipe-name"
+								name="invite-palId"
 								onChange={(e) => {
 									setSelectedPal(
 										pals.find((pal) => pal.userId === e.target.value) ?? null

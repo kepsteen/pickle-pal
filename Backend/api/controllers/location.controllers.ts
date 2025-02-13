@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { Location } from "../models/location.model.js";
 import { Like } from "../models/matches.model.js";
-import { UserDocument } from "../types/types.js";
+import { UserDocument } from "../../types/types.js";
 
 export const setLocation = async (req: Request, res: Response) => {
 	try {
