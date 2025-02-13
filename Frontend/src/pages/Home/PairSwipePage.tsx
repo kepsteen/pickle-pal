@@ -23,6 +23,7 @@ export default function PairSwipePage({ socket }: PairSwipePageProps) {
 				return <PairSwipeInviteCard />;
 			case "session joined":
 				return <PairSwipeSession />;
+			// Todo: Add a case for "session ended"
 		}
 	};
 
