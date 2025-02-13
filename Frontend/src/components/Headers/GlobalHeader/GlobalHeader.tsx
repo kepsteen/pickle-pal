@@ -1,5 +1,6 @@
 import {
-	MapPinned,
+	Home,
+	// MapPinned,
 	MessageSquare,
 	// SlidersHorizontal,
 	UserCog,
@@ -32,7 +33,7 @@ export default function GlobalHeader() {
 						<ul className="flex justify-between gap-8">
 							<li>
 								<NavLink
-									to="/pals"
+									to="/pair-swipe"
 									className={({ isActive }) =>
 										`block p-2 ${isActive ? "border-b-4 border-b-primary" : ""}`
 									}
@@ -40,7 +41,7 @@ export default function GlobalHeader() {
 									<Users />
 								</NavLink>
 							</li>
-							<li>
+							{/* <li>
 								<NavLink
 									to="/map"
 									className={({ isActive }) =>
@@ -49,10 +50,20 @@ export default function GlobalHeader() {
 								>
 									<MapPinned />
 								</NavLink>
+							</li> */}
+							<li>
+								<NavLink
+									to="/home"
+									className={({ isActive }) =>
+										`block p-2 ${isActive ? "border-b-4 border-b-primary" : ""}`
+									}
+								>
+									<Home />
+								</NavLink>
 							</li>
 							<li>
 								<NavLink
-									to="/messages"
+									to="/pals"
 									className={({ isActive }) =>
 										`block p-2 ${isActive ? "border-b-4 border-b-primary" : ""}`
 									}

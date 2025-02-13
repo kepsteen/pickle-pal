@@ -6,10 +6,10 @@ import { ProfileData } from "../../types/user.types.ts";
 import { addLike, getNearbyUsers, setLocation } from "../../lib/api";
 import { useEffect, useState } from "react";
 import { SetLocation } from "../../components/SetLocation/SetLocation.tsx";
-import { useAuth } from "../../providers/AuthContextProvider.tsx";
 import { formatCoordinates } from "../../lib/utils.ts";
 import { toast } from "react-hot-toast";
 import { MatchToast } from "../../components/Toast/Toast";
+import { useAuth } from "@clerk/clerk-react";
 
 export default function HomePage() {
 	const [profiles, setProfiles] = useState<ProfileData[] | undefined>([]);
@@ -19,31 +19,32 @@ export default function HomePage() {
 		null
 	);
 
-	const { token } = useAuth();
-	// Update user location on mount
+	const { getToken } = useAuth();
 
+	// Update user location on mount
 	useEffect(() => {
-		if (token) {
-			navigator.geolocation.getCurrentPosition(async (position) => {
-				try {
-					setPosition(position);
-					await setLocation(position, token);
-				} catch (error) {
-					console.error("Failed to set location:", error);
-				}
-			});
-		}
-	}, [token]);
+		const getLocation = async () => {
+			const token = await getToken();
+			if (token) {
+				navigator.geolocation.getCurrentPosition(async (position) => {
+					try {
+						setPosition(position);
+						await setLocation(position, token);
+					} catch (error) {
+						console.error("Failed to set location:", error);
+					}
+				});
+			}
+		};
+		getLocation();
+	}, [getToken]);
 
 	// Fetch profiles
 	const query = useQuery({
-		queryKey: [
-			"nearby-profiles",
-			token,
-			formatCoordinates(position),
-			maxDistance,
-		],
+		queryKey: ["nearby-profiles", formatCoordinates(position), maxDistance],
 		queryFn: async () => {
+			const token = await getToken();
+			if (!token) return;
 			const data = await getNearbyUsers(
 				formatCoordinates(position),
 				maxDistance,
@@ -52,12 +53,16 @@ export default function HomePage() {
 			setProfiles(data);
 			return data;
 		},
+		enabled: !!position,
+		refetchOnMount: true,
 	});
 
 	const swipeMutation = useMutation({
-		mutationKey: ["swipe", token, profiles?.[0]?.userId, token],
+		mutationKey: ["swipe", profiles?.[0]?.userId],
 		mutationFn: async (isLike: boolean) => {
 			if (!profiles?.length) return;
+			const token = await getToken();
+			if (!token) return;
 			const data = await addLike(profiles[0].userId, isLike, token);
 			if (data?.isMatch) {
 				toast(<MatchToast name={data.matchedUser!.firstName} />);

@@ -121,7 +121,7 @@ export default function ChatWindow({ palId, socket }: ChatWindowProps) {
 					})
 					.map((message) => (
 						<div
-							key={new Date(message.timestamp).getTime()}
+							key={message._id}
 							className={cn(
 								"chat p-2",
 								user?.id === message.sender ? "chat-end" : "chat-start"

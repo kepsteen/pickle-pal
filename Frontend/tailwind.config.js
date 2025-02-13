@@ -16,7 +16,12 @@ export default {
 				"main-content": "calc(100vh - 80px)",
 			},
 			colors: {
-				muted: "oklch(70% 0.012 75)",
+				muted: "rgb(178 178 178)", // Approximate RGB equivalent
+				// or
+				muted: "hsl(0 0% 70%)", // Approximate HSL equivalent
+			},
+			boxShadow: {
+				"pal-card": "0px 0px 9px 2px rgba(190, 255, 0, 0.53)",
 			},
 		},
 	},

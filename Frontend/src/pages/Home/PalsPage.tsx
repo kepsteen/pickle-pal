@@ -44,7 +44,7 @@ export default function PalsPage({ socket }: PalsPageProps) {
 	if (query.isError) return <div>Error: {query.error.message}</div>;
 
 	return (
-		<div className="flex w-screen py-4 lg:py-10 h-main-content container-padding">
+		<main className="flex w-screen py-4 lg:py-10 h-main-content container-padding">
 			<aside
 				className={cn(
 					"px-4 md:px-8 w-full",
@@ -111,6 +111,6 @@ export default function PalsPage({ socket }: PalsPageProps) {
 					<ChatWindow palId={userId} socket={socket} />
 				</section>
 			)}
-		</div>
+		</main>
 	);
 }

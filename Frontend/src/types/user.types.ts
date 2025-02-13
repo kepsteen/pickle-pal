@@ -28,7 +28,7 @@ export type ProfileData = {
 	firstName: string;
 	skillLevel: "Beginner" | "Intermediate" | "Advanced";
 	playStyle: "Dinker" | "Hybrid" | "Banger";
-	lookingFor: [string];
+	lookingFor: string[];
 	duprRating: number;
 	bio: string;
 	profileImageUrl: string;
@@ -56,6 +56,7 @@ export interface AddLikeResponse {
 	matchedUser: User | null;
 }
 export interface Message {
+	_id: string;
 	sender: string;
 	reciever: string;
 	content: string;
