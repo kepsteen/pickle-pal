@@ -16,7 +16,7 @@ export default function PairPalCard({
 }: PairPalCardProps) {
 	return (
 		<AnimatePresence mode="wait">
-			<div className="relative lg:flex h-[560px]">
+			<div className="relative lg:flex h-[660px]">
 				{profiles.map((profile, index) => (
 					<div
 						key={profile.userId}

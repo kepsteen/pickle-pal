@@ -12,7 +12,7 @@ import { ProfileData } from "../../types/user.types";
 import Button from "../../components/Button/Button";
 import { Badge } from "../../components/Badge/Badge";
 import { Avatar } from "../../components/Avatar/Avatar";
-import { Check, CircleX } from "lucide-react";
+import { Check, X } from "lucide-react";
 import SwipeButton from "../../components/SwipeButton/SwipeButton";
 import PairPalCard from "../../components/PairPalCard.tsx/PairPalCard";
 interface PairSwipePageProps {
@@ -44,12 +44,26 @@ const profileData: ProfileData[] = [
 	},
 ];
 
+type UserLike = {
+	userId: string;
+	isLiked: boolean | null;
+};
+
+type PairSwipeLikes = {
+	currentUser: UserLike;
+	otherUser: UserLike;
+};
+
 export default function PairSwipePage({ socket }: PairSwipePageProps) {
 	const { getToken } = useAuth();
 	const { user } = useUser();
 	const [pals, setPals] = useState<ProfileData[]>([]);
 	const [selectedPal, setSelectedPal] = useState<ProfileData | null>(null);
 	const [profiles, setProfiles] = useState<ProfileData[][]>([profileData]);
+	const [likes, setLikes] = useState<PairSwipeLikes>({
+		currentUser: { userId: "user_2ryFwgZm2ynw3BDrhNA5Pyz8B1d", isLiked: null },
+		otherUser: { userId: "user_2sN3AY3EMx4ZhodA3S2J5Txu9C7", isLiked: null },
+	});
 
 	// const query = useQuery({
 	// 	queryKey: ["pals", user?.id],
@@ -73,6 +87,17 @@ export default function PairSwipePage({ socket }: PairSwipePageProps) {
 		const formData = new FormData(e.target as HTMLFormElement);
 		const palName = formData.get("swipe-name");
 		console.log("palId", palName);
+	};
+
+	const handleSwipe = (direction: "left" | "right") => {
+		const isLiked = direction === "right" ? true : false;
+		setLikes((prev) => ({
+			...prev,
+			currentUser: {
+				userId: user?.id ?? prev.currentUser.userId,
+				isLiked,
+			},
+		}));
 	};
 
 	// if (query.isLoading) return <div>Loading...</div>;
@@ -144,13 +169,32 @@ export default function PairSwipePage({ socket }: PairSwipePageProps) {
 			</section> */}
 			<section>
 				<div className="flex items-center justify-center gap-4">
+					{/* {"Current User Avatar"} */}
 					<Avatar />
 					<Card className="bg-base-200">
 						<CardContent className="flex flex-row items-center justify-center gap-4 p-3">
-							<Check className="w-10 h-10 text-muted/60" />
-							<Check className="w-10 h-10 text-muted/60" />
+							{[likes.currentUser, likes.otherUser].map((like) => {
+								if (like.isLiked === null) {
+									return <Check className="w-10 h-10 text-muted/60" />;
+								}
+								if (like.isLiked) {
+									return (
+										<Check
+											key={`${like.userId}-liked-check`}
+											className="w-10 h-10 text-success"
+										/>
+									);
+								}
+								return (
+									<X
+										key={`${like.userId}-disliked-x`}
+										className="w-10 h-10 text-error"
+									/>
+								);
+							})}
 						</CardContent>
 					</Card>
+					{/* {"Other User Avatar"} */}
 					<Avatar />
 				</div>
 				<div className="grid mt-10 place-content-center">
@@ -160,10 +204,18 @@ export default function PairSwipePage({ socket }: PairSwipePageProps) {
 				</div>
 				{profiles && profiles.length !== 0 && (
 					<div className="flex justify-center gap-8 mt-8">
-						<SwipeButton variant="dislike" />
-						<SwipeButton variant="like" />
+						<SwipeButton
+							variant="dislike"
+							onClick={() => handleSwipe("left")}
+						/>
+						<SwipeButton variant="like" onClick={() => handleSwipe("right")} />
 					</div>
 				)}
+				<div className="flex justify-center">
+					<Button variant="error" className="mt-4">
+						Leave Session
+					</Button>
+				</div>
 			</section>
 		</main>
 	);
