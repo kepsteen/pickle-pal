@@ -27,7 +27,6 @@ export const setupChatHandler = (io: Server, socket: Socket) => {
 					reciever: data.reciever,
 					content: data.content,
 				});
-				// Add chat message to the database
 				io.emit("messageResponse", data);
 			} catch (error) {
 				console.error("Error creating message:", error);
