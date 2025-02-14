@@ -1,14 +1,26 @@
-import {
-	Home,
-	// MapPinned,
-	MessageSquare,
-	// SlidersHorizontal,
-	UserCog,
-	Users,
-} from "lucide-react";
+import { Home, Bell, MessageSquare, UserCog, Users } from "lucide-react";
+import { useState, useEffect } from "react";
 import { NavLink } from "react-router";
 
 export default function GlobalHeader() {
+	const [showNotifications, setShowNotifications] = useState(false);
+
+	useEffect(() => {
+		const handleEscape = (e: KeyboardEvent) => {
+			if (e.key === "Escape") {
+				setShowNotifications(false);
+			}
+		};
+
+		if (showNotifications) {
+			document.addEventListener("keydown", handleEscape);
+		}
+
+		return () => {
+			document.removeEventListener("keydown", handleEscape);
+		};
+	}, [showNotifications]);
+
 	return (
 		<header>
 			<nav className="p-4">
@@ -73,27 +85,33 @@ export default function GlobalHeader() {
 							</li>
 						</ul>
 					</li>
-
-					<li className="flex gap-4 justify-end [&_svg]:text-base-content">
-						{/* <NavLink
-							to="/settings"
-							className={({ isActive }) =>
-								isActive ? "border border-b-base-content" : ""
-							}
-						>
-							<SlidersHorizontal />
-						</NavLink> */}
-						<NavLink
-							to="/settings"
-							className={({ isActive }) =>
-								`block p-2 ${
-									isActive ? "border-b-4 border-b-base-content" : ""
-								}`
-							}
-						>
-							<UserCog />
-						</NavLink>
-					</li>
+					<div className="flex gap-4 justify-end [&_svg]:text-base-content relative">
+						<li>
+							<NavLink
+								to="/notifications"
+								className={({ isActive }) =>
+									`block p-2 relative ${
+										isActive ? "border-b-4 border-b-base-content" : ""
+									}`
+								}
+							>
+								<Bell />
+								<span className="absolute w-2 h-2 rounded-full top-1 right-1 bg-primary" />
+							</NavLink>
+						</li>
+						<li>
+							<NavLink
+								to="/settings"
+								className={({ isActive }) =>
+									`block p-2 ${
+										isActive ? "border-b-4 border-b-base-content" : ""
+									}`
+								}
+							>
+								<UserCog />
+							</NavLink>
+						</li>
+					</div>
 				</ul>
 			</nav>
 		</header>
