@@ -5,22 +5,30 @@ import { useState } from "react";
 import PairSwipeInviteCard from "../../components/PaiSwipeInviteCard/PairSwipeInviteCard";
 import PairSwipeInviteForm from "../../components/PairSwipeInviteForm/PairSwipeInviteForm";
 import PairSwipeSession from "../../components/PairSwipeSession/PairSwipeSession";
+import { ProfileData } from "../../types/user.types";
 
 interface PairSwipePageProps {
 	socket: Socket<ServerToClientEvents, ClientToServerEvents>;
 }
 
 export default function PairSwipePage({ socket }: PairSwipePageProps) {
-	const [pageState] = useState<"initial" | "invited" | "session joined">(
-		"session joined"
-	);
+	const [pageState, setPageState] = useState<
+		"initial" | "invited" | "session joined"
+	>("initial");
+	const [invitee, setInvitee] = useState<ProfileData | null>(null);
 
 	const renderCurrentState = () => {
 		switch (pageState) {
 			case "initial":
-				return <PairSwipeInviteForm />;
+				return (
+					<PairSwipeInviteForm
+						socket={socket}
+						setPageState={setPageState}
+						setInvitee={setInvitee}
+					/>
+				);
 			case "invited":
-				return <PairSwipeInviteCard />;
+				return <PairSwipeInviteCard invitee={invitee} />;
 			case "session joined":
 				return <PairSwipeSession />;
 			// Todo: Add a case for "session ended"

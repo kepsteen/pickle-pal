@@ -7,6 +7,7 @@ import {
 	addLike,
 	getPals,
 	getMessages,
+	getUserById,
 } from "../controllers/user.controllers.js";
 import multer from "multer";
 import { requireAuth } from "@clerk/express";
@@ -37,6 +38,9 @@ router.get("/verify/:email", verifyEmailExists);
 
 // Update Profile
 router.patch("/:userId", upload.single("profileImage"), updateProfile);
+
+// Get user by id
+router.get("/:userId/profile", requireAuth(), getUserById);
 
 // Like a user
 router.post("/:userId/likes", requireAuth(), addLike);

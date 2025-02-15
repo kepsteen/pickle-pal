@@ -1,3 +1,4 @@
+import { GetToken } from "@clerk/types";
 import { Message, ProfileData } from "../types/user.types";
 import { AddLikeResponse } from "../types/user.types";
 
@@ -114,5 +115,24 @@ export async function getMessages(token: string | null, palId: string) {
 		return (await response.json()) as Message[];
 	} catch (error) {
 		console.error("Error fetching messages:", error);
+	}
+}
+
+export async function getUserById(
+	userId: string | undefined,
+	getToken: GetToken
+) {
+	const token = await getToken();
+	if (token === null || userId === undefined) return;
+	try {
+		const response = await fetch(`/api/users/${userId}/profile`, {
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		});
+		if (!response.ok) throw new Error("Failed to fetch user");
+		return (await response.json()) as ProfileData;
+	} catch (error) {
+		console.error("Error fetching user by id:", error);
 	}
 }

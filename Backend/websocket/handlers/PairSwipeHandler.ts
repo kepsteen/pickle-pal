@@ -1,23 +1,6 @@
 import { Server, Socket } from "socket.io";
 
 export const setupPairSwipeHandler = (io: Server, socket: Socket) => {
-	socket.on(
-		"join-pair-swipe",
-		({ userId, palId }: { userId: string; palId: string }) => {
-			const roomId = [userId, palId].sort().join("_") + "-pair-swipe";
-			socket.join(roomId);
-		}
-	);
-	// socket.on("pair-swipe-invite", ())
-
-	socket.on(
-		"leave-pair-swipe",
-		({ userId, palId }: { userId: string; palId: string }) => {
-			const roomId = [userId, palId].sort().join("_") + "-pair-swipe";
-			socket.leave(roomId);
-		}
-	);
-
 	// Handler for one individual swipe
 	socket.on(
 		"user-swipe",
