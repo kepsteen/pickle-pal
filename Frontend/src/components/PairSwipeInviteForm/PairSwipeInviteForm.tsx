@@ -15,12 +15,12 @@ import { ClientToServerEvents } from "../../socket";
 interface PairSwipeInviteFormProps {
 	socket: Socket<ServerToClientEvents, ClientToServerEvents>;
 	setPageState: (pageState: "initial" | "invited" | "session joined") => void;
-	setInvitee: (invitee: ProfileData | null) => void;
+	setInviteeId: (inviteeId: string | undefined) => void;
 }
 export default function PairSwipeInviteForm({
 	socket,
 	setPageState,
-	setInvitee,
+	setInviteeId,
 }: PairSwipeInviteFormProps) {
 	const [pals, setPals] = useState<ProfileData[]>([]);
 	const [selectedPal, setSelectedPal] = useState<ProfileData | null>(null);
@@ -55,7 +55,7 @@ export default function PairSwipeInviteForm({
 			inviterId: user?.id,
 			inviteeId: selectedPal.userId,
 		});
-		setInvitee(selectedPal);
+		setInviteeId(selectedPal.userId);
 		setPageState("invited");
 	};
 	return (
