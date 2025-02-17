@@ -14,6 +14,7 @@ export default function PairSwipePage({ socket }: PairSwipePageProps) {
 		"initial" | "invited" | "session joined"
 	>("initial");
 	const [inviteeId, setInviteeId] = useState<string | undefined>(undefined);
+	const [inviterId, setInviterId] = useState<string | undefined>(undefined);
 	const { user } = useUser();
 
 	useEffect(() => {
@@ -32,12 +33,12 @@ export default function PairSwipePage({ socket }: PairSwipePageProps) {
 			(data: {
 				inviterId: string;
 				inviteeId: string;
-				status: "pending" | "accepted" | "declined";
+				status: "Pending" | "Accepted" | "Declined";
 			}) => {
-				if (data.status === "pending") {
-					setInviteeId(data.inviterId);
+				if (data.status === "Pending") {
 					setPageState("invited");
-
+					setInviteeId(data.inviteeId);
+					setInviterId(data.inviterId);
 					console.log(`${data.inviterId} invited you to pair swipe`);
 				}
 			}
@@ -50,6 +51,11 @@ export default function PairSwipePage({ socket }: PairSwipePageProps) {
 		};
 	}, [socket, user?.id]);
 
+	const pairIds = {
+		currentUser: user?.id,
+		pairUser: user?.id === inviteeId ? inviterId : inviteeId,
+	};
+
 	const renderCurrentState = () => {
 		switch (pageState) {
 			case "initial":
@@ -58,12 +64,26 @@ export default function PairSwipePage({ socket }: PairSwipePageProps) {
 						socket={socket}
 						setPageState={setPageState}
 						setInviteeId={setInviteeId}
+						setInviterId={setInviterId}
 					/>
 				);
 			case "invited":
-				return <PairSwipeInviteCard inviteeId={inviteeId} />;
+				return (
+					<PairSwipeInviteCard
+						socket={socket}
+						inviteeId={inviteeId}
+						inviterId={inviterId}
+						setPageState={setPageState}
+					/>
+				);
 			case "session joined":
-				return <PairSwipeSession />;
+				return (
+					<PairSwipeSession
+						pairIds={pairIds}
+						socket={socket}
+						setPageState={setPageState}
+					/>
+				);
 			// Todo: Add a case for "session ended"
 		}
 	};

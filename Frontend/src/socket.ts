@@ -23,8 +23,19 @@ export interface ServerToClientEvents {
 	"pair-swipe-invite-response": (data: {
 		inviterId: string;
 		inviteeId: string;
-		status: "pending" | "accepted" | "declined";
+		status: "Pending" | "Accepted" | "Declined";
 	}) => void;
+	"pair-swipe-action": (data: {
+		currentUser: {
+			userId: string;
+			isLiked: boolean | null;
+		};
+		pairUser: {
+			userId: string;
+			isLiked: boolean | null;
+		};
+	}) => void;
+	"pair-swipe-left": (data: { userId: string; palId: string }) => void;
 }
 
 export interface ClientToServerEvents {
@@ -39,12 +50,22 @@ export interface ClientToServerEvents {
 	"leave-chat": (data: { userId: string; palId: string }) => void;
 	"join-pair-swipe": (data: { userId: string }) => void;
 	"pair-swipe-invite": (data: { inviterId: string; inviteeId: string }) => void;
-	"pair-swipe-response": (data: {
+	"pair-swipe-invite-response": (data: {
 		inviterId: string;
 		inviteeId: string;
-		accepted: boolean;
+		status: "Pending" | "Accepted" | "Declined";
 	}) => void;
 	"leave-pair-swipe": (data: { userId: string; palId: string }) => void;
+	"pair-swipe-action": (data: {
+		currentUser: {
+			userId: string;
+			isLiked: boolean | null;
+		};
+		pairUser: {
+			userId: string;
+			isLiked: boolean | null;
+		};
+	}) => void;
 }
 
 export interface InterServerEvents {

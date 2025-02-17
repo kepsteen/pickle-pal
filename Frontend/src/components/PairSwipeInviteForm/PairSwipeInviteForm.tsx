@@ -16,11 +16,13 @@ interface PairSwipeInviteFormProps {
 	socket: Socket<ServerToClientEvents, ClientToServerEvents>;
 	setPageState: (pageState: "initial" | "invited" | "session joined") => void;
 	setInviteeId: (inviteeId: string | undefined) => void;
+	setInviterId: (inviterId: string | undefined) => void;
 }
 export default function PairSwipeInviteForm({
 	socket,
 	setPageState,
 	setInviteeId,
+	setInviterId,
 }: PairSwipeInviteFormProps) {
 	const [pals, setPals] = useState<ProfileData[]>([]);
 	const [selectedPal, setSelectedPal] = useState<ProfileData | null>(null);
@@ -56,6 +58,7 @@ export default function PairSwipeInviteForm({
 			inviteeId: selectedPal.userId,
 		});
 		setInviteeId(selectedPal.userId);
+		setInviterId(user.id);
 		setPageState("invited");
 	};
 	return (

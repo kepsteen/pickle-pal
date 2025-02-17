@@ -2,7 +2,7 @@ import { Check, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 
 interface SwipeIndicatorProps {
-	userId: string;
+	userId: string | undefined;
 	isLiked: boolean | null;
 }
 
