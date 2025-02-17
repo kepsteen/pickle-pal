@@ -1,36 +1,34 @@
 import { Circle, CircleCheck, CircleX } from "lucide-react";
 import { Avatar } from "../Avatar/Avatar";
-import { Badge } from "../Badge/Badge";
 import { Card } from "../Card/Card";
-import { ProfileData } from "../../types/user.types";
 import { useUser, useAuth } from "@clerk/clerk-react";
 import { useQuery } from "@tanstack/react-query";
 import { getUserById } from "../../lib/api";
 import { useState } from "react";
 
 interface PairSwipeInviteCardProps {
-	invitee: ProfileData | null;
+	inviteeId: string | undefined;
 }
 
 export default function PairSwipeInviteCard({
-	invitee,
+	inviteeId,
 }: PairSwipeInviteCardProps) {
-	const [inviteStatus, setInviteStatus] = useState<
-		"Pending" | "Accepted" | "Declined"
-	>("Pending");
+	const [inviteStatus] = useState<"Pending" | "Accepted" | "Declined">(
+		"Pending"
+	);
 	const { user } = useUser();
 	const { getToken } = useAuth();
 
 	const query = useQuery({
-		queryKey: ["users", user?.id, invitee?.userId],
+		queryKey: ["users", user?.id, inviteeId],
 		queryFn: async () => {
 			const [currentUserData, inviteeData] = await Promise.all([
 				getUserById(user?.id, getToken),
-				getUserById(invitee?.userId, getToken),
+				getUserById(inviteeId, getToken),
 			]);
 			return { currentUserData, inviteeData };
 		},
-		enabled: !!user?.id && !!invitee?.userId,
+		enabled: !!user?.id && !!inviteeId,
 	});
 
 	const renderStatus = () => {
