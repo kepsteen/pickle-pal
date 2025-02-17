@@ -15,10 +15,15 @@ export interface ServerToClientEvents {
 		content: string;
 		timestamp: Date;
 	}) => void;
+	"pair-swipe-joined": (data: {
+		userId: string;
+		roomId: string;
+		joined: boolean;
+	}) => void;
 	"pair-swipe-invite-response": (data: {
 		inviterId: string;
 		inviteeId: string;
-		accepted: boolean;
+		status: "pending" | "accepted" | "declined";
 	}) => void;
 }
 
@@ -32,6 +37,7 @@ export interface ClientToServerEvents {
 	}) => void;
 	"join-chat": (data: { userId: string; palId: string }) => void;
 	"leave-chat": (data: { userId: string; palId: string }) => void;
+	"join-pair-swipe": (data: { userId: string }) => void;
 	"pair-swipe-invite": (data: { inviterId: string; inviteeId: string }) => void;
 	"pair-swipe-response": (data: {
 		inviterId: string;
