@@ -1,12 +1,11 @@
 import express, { Request, Response } from "express";
-import { MongoClient } from "mongodb";
 import "dotenv/config";
 import { usersRouter } from "./api/routes/user.js";
 import cors from "cors";
 import { connectDB } from "./db/connect.js";
 import path from "path";
 import { fileURLToPath } from "url";
-import { clerkMiddleware, requireAuth, AuthObject } from "@clerk/express";
+import { clerkMiddleware, requireAuth } from "@clerk/express";
 import { locationsRouter } from "./api/routes/location.js";
 import http from "http";
 import { initializeWebSocket } from "./websocket/index.js";
