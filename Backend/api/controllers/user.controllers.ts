@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
-import { formatUserImageName } from "../lib/utils.js";
+import { formatUserImageName } from "../../lib/utils.js";
 import { User } from "../models/profile.model.js";
-import { uploadToS3 } from "../s3/client.js";
+import { uploadToS3 } from "../../s3/client.js";
 import dotenv from "dotenv";
-import { Like, Match } from "../models/matches.model.js";
+import { Like, Match, Pair, PairLike } from "../models/matches.model.js";
 import Message from "../models/messages.model.js";
 if (process.env.NODE_ENV === "production") {
 	dotenv.config({ path: "/etc/app.env" });
@@ -194,5 +194,134 @@ export const getMessages = async (req: Request, res: Response) => {
 	} catch (error) {
 		console.error("Error fetching messages", error);
 		res.status(500).json({ error: "Error fetching messages" });
+	}
+};
+
+export const getUserById = async (req: Request, res: Response) => {
+	try {
+		const { userId } = req.params;
+		const user = await User.findOne({ userId });
+		if (!user) {
+			return res.status(404).json({ error: "User not found" });
+		}
+		res.status(200).json(user);
+	} catch (error) {
+		console.error("Error fetching user by id", error);
+		res.status(500).json({ error: "Error fetching user by id" });
+	}
+};
+
+export const getCurrentPair = async (req: Request, res: Response) => {
+	try {
+		const { userId, palId } = req.query;
+		const pair = await Pair.findOne({
+			$or: [
+				{ pairUser1: userId, pairUser2: palId },
+				{ pairUser1: palId, pairUser2: userId },
+			],
+		});
+		if (!pair) {
+			return res.status(404).json({ error: "Pair not found" });
+		}
+
+		// Fetch user profiles
+		const users = await User.find({
+			userId: { $in: [pair.pairUser1, pair.pairUser2] },
+		});
+
+		// Format pair with profiles
+		const pairWithProfiles = {
+			pairId: pair._id.toString(),
+			pairUser1Profile: {
+				...users.find((user) => user.userId === pair.pairUser1)?.toObject(),
+				_id: users
+					.find((user) => user.userId === pair.pairUser1)
+					?._id.toString(),
+			},
+			pairUser2Profile: {
+				...users.find((user) => user.userId === pair.pairUser2)?.toObject(),
+				_id: users
+					.find((user) => user.userId === pair.pairUser2)
+					?._id.toString(),
+			},
+		};
+
+		res.status(200).json(pairWithProfiles);
+	} catch (error) {
+		console.error("Error fetching current pair", error);
+		res.status(500).json({ error: "Error fetching current pair" });
+	}
+};
+
+export const getPairs = async (req: Request, res: Response) => {
+	try {
+		const { userId } = req.auth;
+		const { pairId: currentPairId } = req.query;
+		const pairs = await Pair.find({
+			$and: [{ pairUser1: { $ne: userId } }, { pairUser2: { $ne: userId } }],
+		});
+
+		// Get all unique user IDs from the pairs
+		const userIds = [
+			...new Set(pairs.flatMap((pair) => [pair.pairUser1, pair.pairUser2])),
+		];
+
+		// Fetch all user profiles in one query
+		const users = await User.find({ userId: { $in: userIds } });
+
+		// Fetch all pair likes where the current pair is the liker
+		const interactedPairs = await PairLike.find({
+			pairLiker: currentPairId,
+		});
+
+		// Filter out pairs that have already been interacted with
+		const pairsWithProfiles = pairs
+			.filter(
+				(pair) =>
+					!interactedPairs.some(
+						(interactedPair) =>
+							interactedPair.pairLiked.toString() === pair._id.toString()
+					)
+			)
+			.map((pair) => ({
+				pairId: pair._id.toString(),
+				pairUser1Profile: {
+					...users.find((user) => user.userId === pair.pairUser1)?.toObject(),
+					_id: users
+						.find((user) => user.userId === pair.pairUser1)
+						?._id.toString(),
+				},
+				pairUser2Profile: {
+					...users.find((user) => user.userId === pair.pairUser2)?.toObject(),
+					_id: users
+						.find((user) => user.userId === pair.pairUser2)
+						?._id.toString(),
+				},
+			}));
+
+		res.status(200).json(pairsWithProfiles);
+	} catch (error) {
+		console.error("Error fetching pairs", error);
+		res.status(500).json({ error: "Error fetching pairs" });
+	}
+};
+
+export const addPairLike = async (req: Request, res: Response) => {
+	try {
+		const { isLike, pairLikerId, pairLikedId } = req.body;
+		const pair = await Pair.findById(pairLikedId);
+		if (!pair) {
+			return res.status(404).json({ error: "Pair not found" });
+		}
+
+		const newPairLike = await PairLike.create({
+			pairLiker: pairLikerId,
+			pairLiked: pairLikedId,
+			isLike,
+		});
+
+		res.status(201).json(newPairLike);
+	} catch (error) {
+		console.error("Error adding pair like", error);
 	}
 };

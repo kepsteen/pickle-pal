@@ -1,28 +1,96 @@
-import { ServerToClientEvents } from "../../socket";
+import { ServerToClientEvents, ClientToServerEvents } from "../../socket";
 import { Socket } from "socket.io-client";
-import { ClientToServerEvents } from "../../socket";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PairSwipeInviteCard from "../../components/PaiSwipeInviteCard/PairSwipeInviteCard";
 import PairSwipeInviteForm from "../../components/PairSwipeInviteForm/PairSwipeInviteForm";
 import PairSwipeSession from "../../components/PairSwipeSession/PairSwipeSession";
+import { useUser } from "@clerk/clerk-react";
+import { PairData } from "../../types/user.types";
 
 interface PairSwipePageProps {
 	socket: Socket<ServerToClientEvents, ClientToServerEvents>;
 }
 
 export default function PairSwipePage({ socket }: PairSwipePageProps) {
-	const [pageState] = useState<"initial" | "invited" | "session joined">(
-		"session joined"
-	);
+	const [pageState, setPageState] = useState<
+		"initial" | "invited" | "session joined"
+	>("initial");
+	const [inviteeId, setInviteeId] = useState<string | undefined>(undefined);
+	const [inviterId, setInviterId] = useState<string | undefined>(undefined);
+	const [currentPairData, setCurrentPairData] = useState<PairData | null>(null);
+	const { user } = useUser();
 
-	const renderCurrentState = () => {
+	useEffect(() => {
+		if (!user?.id) return;
+		socket.on(
+			"pair-swipe-joined",
+			(data: { userId: string; roomId: string; joined: boolean }) => {
+				if (data.joined) {
+					console.log("joined pair swipe");
+				}
+			}
+		);
+
+		socket.on(
+			"pair-swipe-invite-response",
+			(data: {
+				inviterId: string;
+				inviteeId: string;
+				status: "Pending" | "Accepted" | "Declined";
+			}) => {
+				if (data.status === "Pending") {
+					setPageState("invited");
+					setInviteeId(data.inviteeId);
+					setInviterId(data.inviterId);
+					console.log(`${data.inviterId} invited you to pair swipe`);
+				}
+			}
+		);
+
+		socket.emit("join-pair-swipe", { userId: user.id });
+		return () => {
+			socket.off("pair-swipe-joined");
+			socket.off("pair-swipe-invite-response");
+		};
+	}, [socket, user?.id]);
+
+	const pairIds = {
+		currentUser: user?.id,
+		pairUser: user?.id === inviteeId ? inviterId : inviteeId,
+	};
+
+	const renderCurrentState = (
+		pageState: "initial" | "invited" | "session joined"
+	) => {
 		switch (pageState) {
 			case "initial":
-				return <PairSwipeInviteForm />;
+				return (
+					<PairSwipeInviteForm
+						socket={socket}
+						setPageState={setPageState}
+						setInviteeId={setInviteeId}
+						setInviterId={setInviterId}
+					/>
+				);
 			case "invited":
-				return <PairSwipeInviteCard />;
+				return (
+					<PairSwipeInviteCard
+						socket={socket}
+						inviteeId={inviteeId}
+						inviterId={inviterId}
+						setPageState={setPageState}
+						setCurrentPairData={setCurrentPairData}
+					/>
+				);
 			case "session joined":
-				return <PairSwipeSession />;
+				return (
+					<PairSwipeSession
+						pairIds={pairIds}
+						currentPairData={currentPairData}
+						socket={socket}
+						setPageState={setPageState}
+					/>
+				);
 			// Todo: Add a case for "session ended"
 		}
 	};
@@ -32,7 +100,7 @@ export default function PairSwipePage({ socket }: PairSwipePageProps) {
 			<h1 className="mx-auto mb-10 text-4xl font-semibold text-base-content">
 				Pair Swipe
 			</h1>
-			{renderCurrentState()}
+			{renderCurrentState(pageState)}
 		</main>
 	);
 }

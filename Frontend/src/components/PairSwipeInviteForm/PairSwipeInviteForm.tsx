@@ -8,8 +8,22 @@ import { useAuth } from "@clerk/clerk-react";
 import { useQuery } from "@tanstack/react-query";
 import { getPals } from "../../lib/api";
 import { useState } from "react";
+import { Socket } from "socket.io-client";
+import { ServerToClientEvents } from "../../socket";
+import { ClientToServerEvents } from "../../socket";
 
-export default function PairSwipeInviteForm() {
+interface PairSwipeInviteFormProps {
+	socket: Socket<ServerToClientEvents, ClientToServerEvents>;
+	setPageState: (pageState: "initial" | "invited" | "session joined") => void;
+	setInviteeId: (inviteeId: string | undefined) => void;
+	setInviterId: (inviterId: string | undefined) => void;
+}
+export default function PairSwipeInviteForm({
+	socket,
+	setPageState,
+	setInviteeId,
+	setInviterId,
+}: PairSwipeInviteFormProps) {
 	const [pals, setPals] = useState<ProfileData[]>([]);
 	const [selectedPal, setSelectedPal] = useState<ProfileData | null>(null);
 
@@ -38,9 +52,14 @@ export default function PairSwipeInviteForm() {
 
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		const formData = new FormData(e.target as HTMLFormElement);
-		const palName = formData.get("swipe-name");
-		console.log("palId", palName);
+		if (!user?.id || !selectedPal) return;
+		socket.emit("pair-swipe-invite", {
+			inviterId: user?.id,
+			inviteeId: selectedPal.userId,
+		});
+		setInviteeId(selectedPal.userId);
+		setInviterId(user.id);
+		setPageState("invited");
 	};
 	return (
 		<section className="p-4">
@@ -50,7 +69,7 @@ export default function PairSwipeInviteForm() {
 						<Label>
 							<span>Invite a Pal to swipe with you</span>
 							<Select
-								name="swipe-name"
+								name="invite-palId"
 								onChange={(e) => {
 									setSelectedPal(
 										pals.find((pal) => pal.userId === e.target.value) ?? null

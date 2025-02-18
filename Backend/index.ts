@@ -1,34 +1,28 @@
 import express, { Request, Response } from "express";
-import { MongoClient } from "mongodb";
 import "dotenv/config";
-import { usersRouter } from "./routes/user.js";
+import { usersRouter } from "./api/routes/user.js";
 import cors from "cors";
 import { connectDB } from "./db/connect.js";
 import path from "path";
 import { fileURLToPath } from "url";
-import { clerkMiddleware, requireAuth, AuthObject } from "@clerk/express";
-import { locationsRouter } from "./routes/location.js";
-import { Server } from "socket.io";
+import { clerkMiddleware, requireAuth } from "@clerk/express";
+import { locationsRouter } from "./api/routes/location.js";
 import http from "http";
-import Message from "./models/messages.model.js";
+import { initializeWebSocket } from "./websocket/index.js";
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
 const port = 3000;
 const server = http.createServer(app);
-const io = new Server(server, {
-	cors: {
-		origin: "*", // Configure this according to your needs
-		methods: ["GET", "POST"],
-	},
-});
+
+// Initialize WebSocket
+const io = initializeWebSocket(server);
 
 // Middleware
 app.use(cors());
-
 app.use(express.json());
-
 app.use(
 	clerkMiddleware({
 		secretKey: process.env.CLERK_SECRET_KEY,
@@ -47,7 +41,6 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/users", usersRouter);
-
 app.use("/api/locations", locationsRouter);
 
 app.get(
@@ -62,37 +55,6 @@ app.get(
 		}
 	}
 );
-
-// Socket.IO connection handling
-io.on("connection", (socket) => {
-	socket.on("join-chat", ({ userId, palId }) => {
-		const roomId = [userId, palId].sort().join("_") + "-chat";
-		socket.join(roomId);
-	});
-
-	socket.on("leave-chat", ({ userId, palId }) => {
-		const roomId = [userId, palId].sort().join("_") + "-chat";
-		socket.leave(roomId);
-	});
-
-	socket.on("message", async (data) => {
-		try {
-			const message = await Message.create({
-				sender: data.sender,
-				reciever: data.reciever,
-				content: data.content,
-			});
-		} catch (error) {
-			console.error("Error creating message:", error);
-		}
-		// Add chat message to the database
-		io.emit("messageResponse", data);
-	});
-
-	socket.on("disconnect", () => {
-		console.log("User disconnected");
-	});
-});
 
 // Serve index.html for all other routes (for client-side routing)
 app.get("*", (req, res) => {
