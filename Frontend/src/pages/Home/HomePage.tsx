@@ -65,7 +65,12 @@ export default function HomePage() {
 			if (!token) return;
 			const data = await addLike(profiles[0].userId, isLike, token);
 			if (data?.isMatch) {
-				toast(<MatchToast name={data.matchedUser!.firstName} />);
+				toast(
+					<MatchToast
+						name={data.matchedUser!.firstName}
+						imageUrl={data.matchedUser!.profileImageUrl ?? ""}
+					/>
+				);
 			}
 			return data;
 		},
