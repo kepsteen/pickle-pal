@@ -35,6 +35,13 @@ export interface ServerToClientEvents {
 			isLiked: boolean | null;
 		};
 	}) => void;
+	"pair-swipe-like": (data: {
+		pairLikerId: string;
+		pairLikedId: string;
+		isLiked: boolean;
+		pairLikerUser1Id: string;
+		pairLikerUser2Id: string;
+	}) => void;
 	"pair-swipe-left": (data: { userId: string; palId: string }) => void;
 }
 
@@ -65,6 +72,13 @@ export interface ClientToServerEvents {
 			userId: string;
 			isLiked: boolean | null;
 		};
+	}) => void;
+	"pair-swipe-like": (data: {
+		pairLikerId: string;
+		pairLikedId: string;
+		isLiked: boolean;
+		pairLikerUser1Id: string;
+		pairLikerUser2Id: string;
 	}) => void;
 }
 

@@ -46,17 +46,17 @@ const matchesSchema = new mongoose.Schema(
 const Match = mongoose.model("Match", matchesSchema);
 
 const pairsSchema = new mongoose.Schema({
-	PairUser1: {
-		type: mongoose.Schema.Types.ObjectId,
-		ref: "User",
+	pairUser1: {
+		type: String,
+		ref: "InitialUser",
 		required: true,
 	},
-	PairUser2: {
-		type: mongoose.Schema.Types.ObjectId,
-		ref: "User",
+	pairUser2: {
+		type: String,
+		ref: "InitialUser",
 		required: true,
 	},
-	timestamp: { type: Date, default: Date.now },
+	createdAt: { type: Date, default: Date.now },
 });
 
 const Pair = mongoose.model("Pair", pairsSchema);
@@ -64,12 +64,12 @@ const Pair = mongoose.model("Pair", pairsSchema);
 const pairLikesSchema = new mongoose.Schema(
 	{
 		pairLiker: {
-			type: mongoose.Schema.Types.ObjectId,
+			type: String,
 			ref: "Pair",
 			required: true,
 		},
 		pairLiked: {
-			type: mongoose.Schema.Types.ObjectId,
+			type: String,
 			ref: "Pair",
 			required: true,
 		},
@@ -87,12 +87,12 @@ const PairLike = mongoose.model("PairLike", pairLikesSchema);
 const pairMatchesSchema = new mongoose.Schema(
 	{
 		pair1Id: {
-			type: mongoose.Schema.Types.ObjectId,
+			type: String,
 			ref: "Pair",
 			required: true,
 		},
 		pair2Id: {
-			type: mongoose.Schema.Types.ObjectId,
+			type: String,
 			ref: "Pair",
 			required: true,
 		},

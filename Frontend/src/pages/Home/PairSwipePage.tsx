@@ -5,6 +5,8 @@ import PairSwipeInviteCard from "../../components/PaiSwipeInviteCard/PairSwipeIn
 import PairSwipeInviteForm from "../../components/PairSwipeInviteForm/PairSwipeInviteForm";
 import PairSwipeSession from "../../components/PairSwipeSession/PairSwipeSession";
 import { useUser } from "@clerk/clerk-react";
+import { PairData } from "../../types/user.types";
+
 interface PairSwipePageProps {
 	socket: Socket<ServerToClientEvents, ClientToServerEvents>;
 }
@@ -15,6 +17,7 @@ export default function PairSwipePage({ socket }: PairSwipePageProps) {
 	>("initial");
 	const [inviteeId, setInviteeId] = useState<string | undefined>(undefined);
 	const [inviterId, setInviterId] = useState<string | undefined>(undefined);
+	const [currentPairData, setCurrentPairData] = useState<PairData | null>(null);
 	const { user } = useUser();
 
 	useEffect(() => {
@@ -56,7 +59,9 @@ export default function PairSwipePage({ socket }: PairSwipePageProps) {
 		pairUser: user?.id === inviteeId ? inviterId : inviteeId,
 	};
 
-	const renderCurrentState = () => {
+	const renderCurrentState = (
+		pageState: "initial" | "invited" | "session joined"
+	) => {
 		switch (pageState) {
 			case "initial":
 				return (
@@ -74,12 +79,14 @@ export default function PairSwipePage({ socket }: PairSwipePageProps) {
 						inviteeId={inviteeId}
 						inviterId={inviterId}
 						setPageState={setPageState}
+						setCurrentPairData={setCurrentPairData}
 					/>
 				);
 			case "session joined":
 				return (
 					<PairSwipeSession
 						pairIds={pairIds}
+						currentPairData={currentPairData}
 						socket={socket}
 						setPageState={setPageState}
 					/>
@@ -93,7 +100,7 @@ export default function PairSwipePage({ socket }: PairSwipePageProps) {
 			<h1 className="mx-auto mb-10 text-4xl font-semibold text-base-content">
 				Pair Swipe
 			</h1>
-			{renderCurrentState()}
+			{renderCurrentState(pageState)}
 		</main>
 	);
 }

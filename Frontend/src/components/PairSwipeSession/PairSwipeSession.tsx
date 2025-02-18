@@ -4,11 +4,11 @@ import SwipeIndicator from "../SwipeIndicator/SwipeIndicator";
 import PairPalCard from "../PairPalCard.tsx/PairPalCard";
 import SwipeButton from "../SwipeButton/SwipeButton";
 import Button from "../Button/Button";
-import { ProfileData } from "../../types/user.types";
+import { PairData, ProfileData } from "../../types/user.types";
 import { useAuth, useUser } from "@clerk/clerk-react";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { getUserById } from "../../lib/api";
+import { getPairs } from "../../lib/api";
 import { ClientToServerEvents, ServerToClientEvents } from "../../socket";
 import { Socket } from "socket.io-client";
 
@@ -52,12 +52,14 @@ interface PairSwipeSessionProps {
 		currentUser: string | undefined;
 		pairUser: string | undefined;
 	};
+	currentPairData: PairData | null;
 	socket: Socket<ServerToClientEvents, ClientToServerEvents>;
 	setPageState: (pageState: "initial" | "invited" | "session joined") => void;
 }
 
 export default function PairSwipeSession({
 	pairIds,
+	currentPairData,
 	socket,
 	setPageState,
 }: PairSwipeSessionProps) {
@@ -66,10 +68,16 @@ export default function PairSwipeSession({
 		currentUser: { userId: pairIds.currentUser, isLiked: null },
 		pairUser: { userId: pairIds.pairUser, isLiked: null },
 	});
+	const [pairProfiles, setPairProfiles] = useState<PairData[]>([]);
+	const [swipeDirection, setSwipeDirection] = useState<"left" | "right">(
+		"left"
+	);
+
 	const { user } = useUser();
 
 	useEffect(() => {
 		socket.on("pair-swipe-action", (data) => {
+			console.log("pair-swipe-action", data);
 			// Only update if the action was performed by the pair user
 			if (data.currentUser.userId !== user?.id) {
 				setLikes((prev) => ({
@@ -85,35 +93,42 @@ export default function PairSwipeSession({
 			setPageState("initial");
 		});
 
+		socket.on("pair-swipe-like", () => {
+			setPairProfiles((prev) => prev?.slice(1) || []);
+		});
+
 		return () => {
 			socket.off("pair-swipe-action");
 			socket.off("pair-swipe-left");
+			socket.off("pair-swipe-like");
 		};
 	}, [socket, user?.id, setPageState]);
 
 	const { getToken } = useAuth();
 
-	const { data, isLoading, error } = useQuery({
-		queryKey: ["users", pairIds.currentUser, pairIds.pairUser],
+	// Query to get the pair profiles
+	useQuery({
+		queryKey: ["pairs", currentPairData?.pairId],
 		queryFn: async () => {
-			const [currentUserData, pairUserData] = await Promise.all([
-				getUserById(pairIds.currentUser, getToken),
-				getUserById(pairIds.pairUser, getToken),
-			]);
-			return { currentUserData, pairUserData };
+			if (!currentPairData?.pairId) return [];
+			const pairs = await getPairs(await getToken(), currentPairData?.pairId);
+			setPairProfiles(pairs ?? []);
+			return pairs;
 		},
-		enabled: !!pairIds.currentUser && !!pairIds.pairUser,
+		enabled: !!currentPairData?.pairId,
 	});
 
 	const handleSwipe = (direction: "left" | "right") => {
 		const isLiked = direction === "right" ? true : false;
-		setLikes((prev) => ({
-			...prev,
+		console.log("isLiked", isLiked);
+		const updatedLikes = {
+			...likes,
 			currentUser: {
 				userId: user?.id ?? "",
 				isLiked,
 			},
-		}));
+		};
+		setLikes(updatedLikes);
 		socket.emit("pair-swipe-action", {
 			currentUser: {
 				userId: user?.id ?? "",
@@ -124,6 +139,38 @@ export default function PairSwipeSession({
 				isLiked: likes.pairUser.isLiked,
 			},
 		});
+
+		const isPairLike =
+			updatedLikes.currentUser.isLiked && updatedLikes.pairUser.isLiked;
+
+		const currentUserLike = updatedLikes.currentUser.isLiked;
+		const pairUserLike = updatedLikes.pairUser.isLiked;
+		const currentUserDislike = updatedLikes.currentUser.isLiked === false;
+		const pairUserDislike = updatedLikes.pairUser.isLiked === false;
+		const bothUsersInteracted =
+			currentUserLike !== null && pairUserLike !== null;
+		const isPairDislike =
+			(currentUserDislike || pairUserDislike) && bothUsersInteracted;
+
+		if (isPairLike) {
+			setSwipeDirection("right");
+			socket.emit("pair-swipe-like", {
+				pairLikerId: currentPairData?.pairId ?? "",
+				pairLikedId: pairProfiles[0].pairId ?? "",
+				isLiked,
+				pairLikerUser1Id: pairIds.currentUser ?? "",
+				pairLikerUser2Id: pairIds.pairUser ?? "",
+			});
+		} else if (isPairDislike) {
+			setSwipeDirection("left");
+			socket.emit("pair-swipe-like", {
+				pairLikerId: currentPairData?.pairId ?? "",
+				pairLikedId: pairProfiles[0].pairId ?? "",
+				isLiked: false,
+				pairLikerUser1Id: pairIds.currentUser ?? "",
+				pairLikerUser2Id: pairIds.pairUser ?? "",
+			});
+		}
 	};
 
 	const handleLeaveSession = () => {
@@ -134,14 +181,13 @@ export default function PairSwipeSession({
 		setPageState("initial");
 	};
 
-	if (isLoading) return <div>Loading...</div>;
-	if (error) return <div>Error: {error.message}</div>;
-
 	return (
 		<section>
 			<div className="flex items-center justify-center gap-4">
 				{/* {"Current User Avatar"} */}
-				<Avatar imageUrl={data?.currentUserData?.profileImageUrl ?? ""} />
+				<Avatar
+					imageUrl={currentPairData?.pairUser1Profile?.profileImageUrl ?? ""}
+				/>
 				<Card className="bg-base-200">
 					<CardContent className="flex flex-row items-center justify-center gap-4 p-3">
 						{/* Add a container div with fixed dimensions */}
@@ -158,11 +204,16 @@ export default function PairSwipeSession({
 					</CardContent>
 				</Card>
 				{/* {"Pair User Avatar"} */}
-				<Avatar imageUrl={data?.pairUserData?.profileImageUrl ?? ""} />
+				<Avatar
+					imageUrl={currentPairData?.pairUser2Profile?.profileImageUrl ?? ""}
+				/>
 			</div>
 			<div className="grid mt-10 place-content-center">
-				{profiles && profiles[0] && (
-					<PairPalCard profiles={profiles[0]} swipeDirection={"left"} />
+				{pairProfiles && pairProfiles.length !== 0 && (
+					<PairPalCard
+						profiles={pairProfiles[0]}
+						swipeDirection={swipeDirection}
+					/>
 				)}
 			</div>
 			{profiles && profiles.length !== 0 && (

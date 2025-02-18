@@ -3,16 +3,17 @@ import { Avatar } from "../Avatar/Avatar";
 import { Card } from "../Card/Card";
 import { useUser, useAuth } from "@clerk/clerk-react";
 import { useQuery } from "@tanstack/react-query";
-import { getUserById } from "../../lib/api";
+import { getCurrentPair } from "../../lib/api";
 import { useEffect, useState } from "react";
 import Button from "../Button/Button";
 import { ServerToClientEvents, ClientToServerEvents } from "../../socket";
 import { Socket } from "socket.io-client";
-
+import { PairData } from "../../types/user.types";
 interface PairSwipeInviteCardProps {
 	inviteeId: string | undefined;
 	inviterId: string | undefined;
 	setPageState: (state: "initial" | "invited" | "session joined") => void;
+	setCurrentPairData: (pairData: PairData | null) => void;
 	socket: Socket<ServerToClientEvents, ClientToServerEvents>;
 }
 
@@ -46,6 +47,7 @@ export default function PairSwipeInviteCard({
 	inviteeId,
 	inviterId,
 	setPageState,
+	setCurrentPairData,
 	socket,
 }: PairSwipeInviteCardProps) {
 	const [inviteStatus, setInviteStatus] = useState<
@@ -74,13 +76,15 @@ export default function PairSwipeInviteCard({
 	const { getToken } = useAuth();
 
 	const { data, isLoading, error } = useQuery({
-		queryKey: ["users", inviterId, inviteeId],
+		queryKey: ["pair-data", [inviterId, inviteeId].sort().join("_")],
 		queryFn: async () => {
-			const [inviterData, inviteeData] = await Promise.all([
-				getUserById(inviterId, getToken),
-				getUserById(inviteeId, getToken),
-			]);
-			return { inviterData, inviteeData };
+			const pairData = await getCurrentPair(
+				inviterId,
+				inviteeId,
+				await getToken()
+			);
+			setCurrentPairData(pairData);
+			return pairData;
 		},
 		enabled: !!inviterId && !!inviteeId,
 	});
@@ -110,10 +114,10 @@ export default function PairSwipeInviteCard({
 				{renderStatus(inviteStatus)}
 				<div className="flex items-center justify-between">
 					<div className="flex items-center gap-4">
-						<Avatar imageUrl={data?.inviterData?.profileImageUrl ?? ""} />
+						<Avatar imageUrl={data?.pairUser1Profile?.profileImageUrl ?? ""} />
 						<div className="flex flex-col">
 							<span className="text-lg font-semibold">
-								{data?.inviterData?.firstName}
+								{data?.pairUser1Profile?.firstName}
 							</span>
 							<span className="text-sm text-gray-500">
 								{isInviter ? "You" : "Invited You"}
@@ -123,13 +127,13 @@ export default function PairSwipeInviteCard({
 					<div className="flex items-center gap-4">
 						<div className="flex flex-col">
 							<span className="text-lg font-semibold">
-								{data?.inviteeData?.firstName}
+								{data?.pairUser2Profile?.firstName}
 							</span>
 							<span className="text-sm text-gray-500">
 								{isInvitee ? "You" : "Invited by You"}
 							</span>
 						</div>
-						<Avatar imageUrl={data?.inviteeData?.profileImageUrl ?? ""} />
+						<Avatar imageUrl={data?.pairUser2Profile?.profileImageUrl ?? ""} />
 					</div>
 				</div>
 				{isInvitee && (

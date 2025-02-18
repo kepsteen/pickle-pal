@@ -62,3 +62,9 @@ export interface Message {
 	content: string;
 	timestamp: Date;
 }
+
+export interface PairData {
+	pairId: string;
+	pairUser1Profile: ProfileData;
+	pairUser2Profile: ProfileData;
+}

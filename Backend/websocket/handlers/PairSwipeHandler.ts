@@ -1,4 +1,5 @@
 import { Server, Socket } from "socket.io";
+import { PairLike, PairMatch } from "../../api/models/matches.model.js";
 
 export const setupPairSwipeHandler = (io: Server, socket: Socket) => {
 	// Handler for one individual swipe
@@ -81,6 +82,59 @@ export const setupPairSwipeHandler = (io: Server, socket: Socket) => {
 				"-pair-swipe-session";
 			socket.join(roomId);
 			io.to(roomId).emit("pair-swipe-action", { currentUser, pairUser });
+		}
+	);
+
+	socket.on(
+		"pair-swipe-like",
+		async (data: {
+			pairLikerId: string;
+			pairLikedId: string;
+			isLiked: boolean;
+			pairLikerUser1Id: string;
+			pairLikerUser2Id: string;
+		}) => {
+			console.log("pair-swipe-like", data);
+			try {
+				const {
+					pairLikerId,
+					pairLikedId,
+					isLiked,
+					pairLikerUser1Id,
+					pairLikerUser2Id,
+				} = data;
+				const roomId =
+					[pairLikerUser1Id, pairLikerUser2Id].sort().join("_") +
+					"-pair-swipe-session";
+				socket.join(roomId);
+				const pairLike = await PairLike.create({
+					pairLiker: pairLikerId,
+					pairLiked: pairLikedId,
+					isLike: isLiked,
+				});
+
+				// check for a match
+				const pairMatch = await PairLike.findOne({
+					pairLiker: pairLikedId,
+					pairLiked: pairLikerId,
+					isLike: true,
+				});
+
+				if (pairMatch) {
+					await PairMatch.create({
+						pair1Id: pairLikerId,
+						pair2Id: pairLikedId,
+					});
+				}
+
+				io.to(roomId).emit("pair-swipe-like", {
+					pairLikerId,
+					pairLikedId,
+					isLiked,
+				});
+			} catch (error) {
+				console.error("Error adding pair like", error);
+			}
 		}
 	);
 

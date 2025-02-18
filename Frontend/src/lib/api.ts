@@ -1,5 +1,5 @@
 import { GetToken } from "@clerk/types";
-import { Message, ProfileData } from "../types/user.types";
+import { Message, PairData, ProfileData } from "../types/user.types";
 import { AddLikeResponse } from "../types/user.types";
 
 export async function getUsers(currentUserId: string) {
@@ -134,5 +134,43 @@ export async function getUserById(
 		return (await response.json()) as ProfileData;
 	} catch (error) {
 		console.error("Error fetching user by id:", error);
+	}
+}
+
+export async function getCurrentPair(
+	userId: string | undefined,
+	palId: string | undefined,
+	token: string | null
+): Promise<PairData | null> {
+	if (token === null) return null;
+	try {
+		const response = await fetch(
+			`/api/users/current-pair?userId=${userId}&palId=${palId}`,
+			{
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			}
+		);
+		if (!response.ok) throw new Error("Failed to fetch current pair");
+		return (await response.json()) as PairData;
+	} catch (error) {
+		console.error("Error fetching current pair:", error);
+		return null;
+	}
+}
+
+export async function getPairs(token: string | null, pairId: string | null) {
+	if (token === null) return [];
+	try {
+		const response = await fetch(`/api/users/pairs?pairId=${pairId}`, {
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		});
+		if (!response.ok) throw new Error("Failed to fetch pairs");
+		return (await response.json()) as PairData[];
+	} catch (error) {
+		console.error("Error fetching pairs:", error);
 	}
 }
