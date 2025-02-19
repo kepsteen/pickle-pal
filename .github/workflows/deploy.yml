@@ -33,6 +33,9 @@ jobs:
           echo "VITE_CLERK_PUBLISHABLE_KEY=$VITE_CLERK_PUBLISHABLE_KEY" > .env
           npm ci
           npm run build
+          # Move the build files to a specific directory that Backend will serve
+          mkdir -p ../Backend/public
+          cp -r dist/* ../Backend/public/
 
           # Install dependencies for Backend
           cd ../Backend

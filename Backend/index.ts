@@ -58,7 +58,7 @@ app.get(
 
 // Serve index.html for all other routes (for client-side routing)
 app.get("*", (req, res) => {
-	res.sendFile(path.join(__dirname, "../../Frontend/dist/index.html"));
+	res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 connectDB().then(() => {
