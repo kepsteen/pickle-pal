@@ -30,16 +30,14 @@ app.use(
 	})
 );
 
-// Serve static files from the Frontend/dist directory
-app.use(express.static(path.join(__dirname, "../Frontend/dist")));
-
-// Serve static files from the public folder
+// Serve static files from the public directory
 app.use(express.static(path.join(__dirname, "public")));
 
 app.get("/", (req, res) => {
 	res.send("Hello World!");
 });
 
+// API routes
 app.use("/api/users", usersRouter);
 app.use("/api/locations", locationsRouter);
 
@@ -56,7 +54,7 @@ app.get(
 	}
 );
 
-// Serve index.html for all other routes (for client-side routing)
+// Catch-all route for SPA - should be after API routes
 app.get("*", (req, res) => {
 	res.sendFile(path.join(__dirname, "public", "index.html"));
 });
