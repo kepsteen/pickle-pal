@@ -9,9 +9,13 @@ import { clerkMiddleware, requireAuth } from "@clerk/express";
 import { locationsRouter } from "./api/routes/location.js";
 import http from "http";
 import { initializeWebSocket } from "./websocket/index.js";
+import { connectRedis, getOrSetCache, redis } from "./redis/client.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+const reactStaticDir = new URL("../Frontend/public/dist", import.meta.url)
+	.pathname;
 
 const app = express();
 const port = 3000;
@@ -54,13 +58,38 @@ app.get(
 	}
 );
 
+app.get(
+	"/api/test-redis/pokemon/:name",
+	async (req: Request, res: Response) => {
+		try {
+			const { name } = req.params;
+			const pokemon = await getOrSetCache(`pokemon:${name}`, async () => {
+				const response = await fetch(
+					`https://pokeapi.co/api/v2/pokemon/${name}`
+				);
+				return await response.json();
+			});
+			res.status(200).json(pokemon);
+		} catch (error) {
+			console.error("Redis error:", error);
+			res.status(500).json({ error: "Redis operation failed" });
+		}
+	}
+);
+
 // Catch-all route for SPA - should be after API routes
 app.get("*", (req, res) => {
-	res.sendFile(path.join(__dirname, "..", "public", "index.html"));
+	res.sendFile(path.join(`${reactStaticDir}/index.html`));
 });
 
-connectDB().then(() => {
-	server.listen(port, "0.0.0.0", () =>
-		console.log(`Server running on port ${port}`)
-	);
-});
+connectDB()
+	.then(() => connectRedis())
+	.then(() => {
+		server.listen(port, "0.0.0.0", () =>
+			console.log(`Server running on port ${port}`)
+		);
+	})
+	.catch((error) => {
+		console.error("Failed to connect to services:", error);
+		process.exit(1);
+	});
