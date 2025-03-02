@@ -13,6 +13,7 @@ import TestSocketIO from "./pages/TestSocketIOPage.tsx";
 import { socket } from "./socket.ts";
 import PairSwipePage from "./pages/Home/PairSwipePage.tsx";
 import NotificationsPage from "./pages/Home/NotificationsPage.tsx";
+import SettingsPage from "./pages/Settings/SettingsPage.tsx";
 function App() {
 	return (
 		<>
@@ -48,6 +49,7 @@ function App() {
 							element={<PairSwipePage socket={socket} />}
 						/>
 						<Route path="notifications" element={<NotificationsPage />} />
+						<Route path="settings" element={<SettingsPage />} />
 						{/* messages page */}
 						{/* map page */}
 					</Route>
