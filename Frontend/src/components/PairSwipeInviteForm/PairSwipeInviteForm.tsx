@@ -5,8 +5,8 @@ import { Select } from "../Select/Select";
 import { ProfileData } from "../../types/user.types";
 import { useUser } from "@clerk/clerk-react";
 import { useAuth } from "@clerk/clerk-react";
-import { useQuery } from "@tanstack/react-query";
-import { getPals } from "../../lib/api";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { getPals, savePairSwipeSession } from "../../lib/api";
 import { useState } from "react";
 import { Socket } from "socket.io-client";
 import { ServerToClientEvents } from "../../socket";
@@ -47,6 +47,20 @@ export default function PairSwipeInviteForm({
 		staleTime: 0,
 	});
 
+	const { mutate: saveSession } = useMutation({
+		mutationFn: async () => {
+			const token = await getToken();
+			if (!token) return;
+			const data = await savePairSwipeSession(token, {
+				pageState: "invited",
+				inviteeId: selectedPal?.userId,
+				inviterId: user?.id,
+				currentPairData: null,
+			});
+			return data;
+		},
+	});
+
 	if (query.isLoading) return <div>Loading...</div>;
 	if (query.isError) return <div>Error: {query.error.message}</div>;
 
@@ -60,6 +74,7 @@ export default function PairSwipeInviteForm({
 		setInviteeId(selectedPal.userId);
 		setInviterId(user.id);
 		setPageState("invited");
+		saveSession();
 	};
 	return (
 		<section className="p-4">

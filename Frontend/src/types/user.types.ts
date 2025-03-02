@@ -68,3 +68,9 @@ export interface PairData {
 	pairUser1Profile: ProfileData;
 	pairUser2Profile: ProfileData;
 }
+export interface PairSwipeSession {
+	pageState: "initial" | "invited" | "session joined";
+	inviteeId?: string;
+	inviterId?: string;
+	currentPairData?: PairData | null;
+}

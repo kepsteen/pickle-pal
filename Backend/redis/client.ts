@@ -1,6 +1,6 @@
 import { createClient } from "redis";
 
-const DEFAULT_EXPIRATION = 3600;
+export const DEFAULT_EXPIRATION = 3600;
 
 const client = createClient();
 

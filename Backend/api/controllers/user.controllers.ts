@@ -5,6 +5,7 @@ import { uploadToS3 } from "../../s3/client.js";
 import dotenv from "dotenv";
 import { Like, Match, Pair, PairLike } from "../models/matches.model.js";
 import Message from "../models/messages.model.js";
+import { pairSwipeSessionManager } from "../../redis/PairSwipeSessionManager.js";
 if (process.env.NODE_ENV === "production") {
 	dotenv.config({ path: "/etc/app.env" });
 } else {
@@ -323,5 +324,37 @@ export const addPairLike = async (req: Request, res: Response) => {
 		res.status(201).json(newPairLike);
 	} catch (error) {
 		console.error("Error adding pair like", error);
+	}
+};
+
+export const getPairSwipeSession = async (req: Request, res: Response) => {
+	try {
+		const { userId } = req.auth;
+		if (!userId) {
+			return res.status(401).json({ error: "Unauthorized" });
+		}
+		const session = await pairSwipeSessionManager.getSession(userId);
+		if (!session) {
+			return res.status(404).json({ error: "Pair swipe session not found" });
+		}
+		res.status(200).json(session);
+	} catch (error) {
+		console.error("Error fetching pair swipe session", error);
+		res.status(500).json({ error: "Error fetching pair swipe session" });
+	}
+};
+
+export const SavePairSwipeSession = async (req: Request, res: Response) => {
+	try {
+		const { userId } = req.auth;
+		if (!userId) {
+			return res.status(401).json({ error: "Unauthorized" });
+		}
+		console.log("req.body", req.body);
+		const session = await pairSwipeSessionManager.saveSession(userId, req.body);
+		res.status(201).json(session);
+	} catch (error) {
+		console.error("Error creating pair swipe session", error);
+		res.status(500).json({ error: "Error creating pair swipe session" });
 	}
 };

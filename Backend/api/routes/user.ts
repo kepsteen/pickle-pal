@@ -10,6 +10,9 @@ import {
 	getUserById,
 	getPairs,
 	getCurrentPair,
+	addPairLike,
+	getPairSwipeSession,
+	SavePairSwipeSession,
 } from "../controllers/user.controllers.js";
 import multer from "multer";
 import { requireAuth } from "@clerk/express";
@@ -53,6 +56,9 @@ router.get("/all", getUsers);
 // Get all pairs
 router.get("/pairs", requireAuth(), getPairs);
 
+// Like a Pair
+router.post("/:pairId/likes", requireAuth(), addPairLike);
+
 // Like a user
 router.post("/:userId/likes", requireAuth(), addLike);
 
@@ -64,5 +70,11 @@ router.get("/:userId/profile", requireAuth(), getUserById);
 
 // Update Profile
 router.patch("/:userId", upload.single("profileImage"), updateProfile);
+
+// Get pair swipe session
+router.get("/pair-swipe-session", requireAuth(), getPairSwipeSession);
+
+// Save pair swipe session
+router.post("/pair-swipe-session", requireAuth(), SavePairSwipeSession);
 
 export const usersRouter = router;
