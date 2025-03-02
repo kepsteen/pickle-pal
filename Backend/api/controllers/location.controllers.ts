@@ -38,6 +38,9 @@ export const getNearByUsers = async (req: Request, res: Response) => {
 		const lng = parseFloat(req.query.lng as string);
 
 		const { userId } = req.auth;
+		if (!userId) {
+			return res.status(401).json({ error: "Unauthorized" });
+		}
 		if (isNaN(lat) || isNaN(lng) || isNaN(maxDistance)) {
 			return res.status(400).json({
 				error:
@@ -103,6 +106,9 @@ export const getNearByPairs = async (req: Request, res: Response) => {
 		const lng = parseFloat(req.query.lng as string);
 
 		const { userId } = req.auth;
+		if (!userId) {
+			return res.status(401).json({ error: "Unauthorized" });
+		}
 		if (isNaN(lat) || isNaN(lng) || isNaN(maxDistance)) {
 			return res.status(400).json({
 				error:

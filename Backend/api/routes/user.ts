@@ -51,7 +51,7 @@ router.get("/pals", requireAuth(), getPals);
 // router.post("/:userId/settings", updateSettings);
 
 // Get all users
-router.get("/all", getUsers);
+router.get("/all", requireAuth(), getUsers);
 
 // Get all pairs
 router.get("/pairs", requireAuth(), getPairs);
@@ -69,7 +69,12 @@ router.get("/:palId/messages", requireAuth(), getMessages);
 router.get("/:userId/profile", requireAuth(), getUserById);
 
 // Update Profile
-router.patch("/:userId", upload.single("profileImage"), updateProfile);
+router.patch(
+	"/profile",
+	upload.single("profileImage"),
+	requireAuth(),
+	updateProfile
+);
 
 // Get pair swipe session
 router.get("/pair-swipe-session", requireAuth(), getPairSwipeSession);

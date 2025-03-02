@@ -46,7 +46,10 @@ export const verifyEmailExists = async (req: Request, res: Response) => {
 
 export const updateProfile = async (req: Request, res: Response) => {
 	try {
-		const { userId } = req.params;
+		const { userId } = req.auth;
+		if (!userId) {
+			return res.status(401).json({ error: "Unauthorized" });
+		}
 		const profileImage = req.file;
 		const { firstName, skillLevel, playStyle, duprRating, bio, lookingFor } =
 			req.body;
@@ -89,9 +92,13 @@ export const updateProfile = async (req: Request, res: Response) => {
 
 export const getUsers = async (req: Request, res: Response) => {
 	try {
+		const { userId } = req.auth;
+		if (!userId) {
+			return res.status(401).json({ error: "Unauthorized" });
+		}
 		const { excludeUserId } = req.query;
 
-		const users = await User.find({ userId: { $ne: excludeUserId } });
+		const users = await User.find({ userId: { $ne: userId } });
 
 		if (users.length === 0) res.status(404).json({ error: "No users found" });
 
