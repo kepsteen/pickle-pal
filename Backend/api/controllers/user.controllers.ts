@@ -351,7 +351,10 @@ export const SavePairSwipeSession = async (req: Request, res: Response) => {
 			return res.status(401).json({ error: "Unauthorized" });
 		}
 		console.log("req.body", req.body);
-		const session = await pairSwipeSessionManager.saveSession(userId, req.body);
+		const session = await Promise.all([
+			await pairSwipeSessionManager.saveSession(req.body.inviterId, req.body),
+			await pairSwipeSessionManager.saveSession(req.body.inviteeId, req.body),
+		]);
 		res.status(201).json(session);
 	} catch (error) {
 		console.error("Error creating pair swipe session", error);

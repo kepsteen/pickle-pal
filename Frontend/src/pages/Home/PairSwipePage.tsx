@@ -55,7 +55,7 @@ export default function PairSwipePage({ socket }: PairSwipePageProps) {
 			setPageState(recoveredPairSwipeSession.pageState);
 			setInviteeId(recoveredPairSwipeSession.inviteeId);
 			setInviterId(recoveredPairSwipeSession.inviterId);
-			setCurrentPairData(recoveredPairSwipeSession.currentPairData ?? null);
+			// setCurrentPairData(recoveredPairSwipeSession.currentPairData ?? null);
 		}
 
 		socket.on(

@@ -92,6 +92,9 @@ export default function PairSwipeInviteCard({
 	const isInviter = user?.id === inviterId;
 	const isInvitee = user?.id === inviteeId;
 
+	console.log("isInviter", isInviter);
+	console.log("isInvitee", isInvitee);
+
 	const handleInviteResponse = (response: "Accept" | "Decline") => {
 		const status = response === "Accept" ? "Accepted" : "Declined";
 		socket.emit("pair-swipe-invite-response", {
@@ -120,7 +123,13 @@ export default function PairSwipeInviteCard({
 								{data?.pairUser1Profile?.firstName}
 							</span>
 							<span className="text-sm text-gray-500">
-								{isInviter ? "You" : "Invited You"}
+								{user?.id === inviterId
+									? data?.pairUser1Profile.userId !== inviterId
+										? "Invited by you"
+										: "You"
+									: data?.pairUser1Profile.userId === inviterId
+									? "Invited you"
+									: "You"}
 							</span>
 						</div>
 					</div>
@@ -130,7 +139,13 @@ export default function PairSwipeInviteCard({
 								{data?.pairUser2Profile?.firstName}
 							</span>
 							<span className="text-sm text-gray-500">
-								{isInvitee ? "You" : "Invited by You"}
+								{user?.id === inviterId
+									? data?.pairUser2Profile.userId !== inviterId
+										? "Invited by you"
+										: "You"
+									: data?.pairUser2Profile.userId === inviterId
+									? "Invited you"
+									: "You"}
 							</span>
 						</div>
 						<Avatar imageUrl={data?.pairUser2Profile?.profileImageUrl ?? ""} />
