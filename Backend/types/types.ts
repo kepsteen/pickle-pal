@@ -43,3 +43,15 @@ export interface AddLikeResponse {
 	isMatch: boolean;
 	matchedUser: User | null;
 }
+export interface PairData {
+	pairId: string;
+	pairUser1Profile: User;
+	pairUser2Profile: User;
+}
+
+export interface PairSwipeSession {
+	pageState: "initial" | "invited" | "session joined";
+	inviteeId: string;
+	inviterId: string;
+	currentPairData: PairData | null;
+}

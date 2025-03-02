@@ -80,13 +80,14 @@ export default function PairSwipeSession({
 			console.log("pair-swipe-action", data);
 			// Only update if the action was performed by the pair user
 			if (data.currentUser.userId !== user?.id) {
-				setLikes((prev) => ({
-					...prev,
+				const updatedLikes = {
+					...likes,
 					pairUser: {
 						userId: data.currentUser.userId,
 						isLiked: data.currentUser.isLiked,
 					},
-				}));
+				};
+				setLikes(updatedLikes);
 			}
 		});
 		socket.on("pair-swipe-left", () => {
@@ -95,6 +96,10 @@ export default function PairSwipeSession({
 
 		socket.on("pair-swipe-like", () => {
 			setPairProfiles((prev) => prev?.slice(1) || []);
+			setLikes({
+				currentUser: { userId: likes.currentUser.userId ?? "", isLiked: null },
+				pairUser: { userId: likes.pairUser.userId ?? "", isLiked: null },
+			});
 		});
 
 		return () => {
@@ -102,7 +107,7 @@ export default function PairSwipeSession({
 			socket.off("pair-swipe-left");
 			socket.off("pair-swipe-like");
 		};
-	}, [socket, user?.id, setPageState]);
+	}, [socket, user?.id, setPageState, likes]);
 
 	const { getToken } = useAuth();
 
@@ -169,6 +174,13 @@ export default function PairSwipeSession({
 				isLiked: false,
 				pairLikerUser1Id: pairIds.currentUser ?? "",
 				pairLikerUser2Id: pairIds.pairUser ?? "",
+			});
+		}
+
+		if (isPairLike || isPairDislike) {
+			setLikes({
+				currentUser: { userId: likes.currentUser.userId ?? "", isLiked: null },
+				pairUser: { userId: likes.pairUser.userId ?? "", isLiked: null },
 			});
 		}
 	};

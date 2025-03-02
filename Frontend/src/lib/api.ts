@@ -1,5 +1,10 @@
 import { GetToken } from "@clerk/types";
-import { Message, PairData, ProfileData } from "../types/user.types";
+import {
+	Message,
+	PairData,
+	PairSwipeSession,
+	ProfileData,
+} from "../types/user.types";
 import { AddLikeResponse } from "../types/user.types";
 
 export async function getUsers(currentUserId: string) {
@@ -172,5 +177,41 @@ export async function getPairs(token: string | null, pairId: string | null) {
 		return (await response.json()) as PairData[];
 	} catch (error) {
 		console.error("Error fetching pairs:", error);
+	}
+}
+
+export async function savePairSwipeSession(
+	token: string | null,
+	sessionData: PairSwipeSession
+) {
+	if (token === null) return;
+	try {
+		const response = await fetch("/api/users/pair-swipe-session", {
+			method: "POST",
+			headers: {
+				Authorization: `Bearer ${token}`,
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify(sessionData),
+		});
+		if (!response.ok) throw new Error("Failed to save pair swipe session");
+		return await response.json();
+	} catch (error) {
+		console.error("Error saving pair swipe session:", error);
+	}
+}
+
+export async function getPairSwipeSession(token: string | null) {
+	if (token === null) return;
+	try {
+		const response = await fetch("/api/users/pair-swipe-session", {
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		});
+		if (!response.ok) throw new Error("Failed to fetch pair swipe session");
+		return (await response.json()) as PairSwipeSession;
+	} catch (error) {
+		console.error("Error fetching pair swipe session:", error);
 	}
 }
