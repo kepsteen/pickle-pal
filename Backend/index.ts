@@ -13,6 +13,9 @@ import { initializeWebSocket } from "./websocket/index.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Define the path to the Frontend build directory
+const frontendBuildDir = path.join(__dirname, "..", "Frontend", "dist");
+
 const app = express();
 const port = 3000;
 const server = http.createServer(app);
@@ -30,8 +33,8 @@ app.use(
 	})
 );
 
-// Serve static files from the public directory
-app.use(express.static(path.join(__dirname, "..", "public")));
+// Serve static files from the Frontend build directory
+app.use(express.static(frontendBuildDir));
 
 app.get("/", (req, res) => {
 	res.send("Hello World!");
@@ -56,7 +59,7 @@ app.get(
 
 // Catch-all route for SPA - should be after API routes
 app.get("*", (req, res) => {
-	res.sendFile(path.join(__dirname, "..", "public", "index.html"));
+	res.sendFile(path.join(frontendBuildDir, "index.html"));
 });
 
 connectDB().then(() => {
