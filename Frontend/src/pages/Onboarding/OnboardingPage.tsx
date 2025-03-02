@@ -21,7 +21,7 @@ type OnboardingPageProps = {
 export default function OnboardingPage({ isEditing }: OnboardingPageProps) {
 	const [selectedImage, setSelectedImage] = useState("");
 	const [isLoading, setIsLoading] = useState(true);
-	const { userId: clerkId, isLoaded } = useAuth();
+	const { userId: clerkId, isLoaded, getToken } = useAuth();
 	const navigate = useNavigate();
 
 	useEffect(() => {
@@ -68,9 +68,12 @@ export default function OnboardingPage({ isEditing }: OnboardingPageProps) {
 			formData.append("bio", data.bio);
 			formData.append("lookingFor", JSON.stringify(lookingForArray));
 
-			const response = await fetch(`/api/users/${clerkId}`, {
+			const response = await fetch(`/api/users/profile`, {
 				method: "PATCH",
 				body: formData,
+				headers: {
+					Authorization: `Bearer ${await getToken()}`,
+				},
 			});
 
 			if (!response.ok) {

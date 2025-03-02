@@ -10,7 +10,7 @@ const router = express.Router();
 
 router.post("/", requireAuth(), setLocation);
 // router.get("/nearby-users", requireAuth(), getNearByUsers);
-router.get("/nearby-users", getNearByUsers);
-router.get("/nearby-pairs", getNearByPairs);
+router.get("/nearby-users", requireAuth(), getNearByUsers);
+router.get("/nearby-pairs", requireAuth(), getNearByPairs);
 
 export const locationsRouter = router;
