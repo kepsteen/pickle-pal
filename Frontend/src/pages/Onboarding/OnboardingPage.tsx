@@ -67,6 +67,7 @@ export default function OnboardingPage({ isEditing }: OnboardingPageProps) {
 			formData.append("duprRating", data.duprRating.toString());
 			formData.append("bio", data.bio);
 			formData.append("lookingFor", JSON.stringify(lookingForArray));
+			formData.append("isOnboarded", "true");
 
 			const response = await fetch(`/api/users/profile`, {
 				method: "PATCH",

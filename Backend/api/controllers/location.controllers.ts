@@ -87,6 +87,7 @@ export const getNearByUsers = async (req: Request, res: Response) => {
 				localField: "userId",
 				foreignField: "userId",
 			})
+			.limit(100)
 			.exec();
 
 		const userDocs: UserDocument[] = users
@@ -100,9 +101,14 @@ export const getNearByUsers = async (req: Request, res: Response) => {
 
 		const interactedUsers = interactedLikes.map((like) => like.liked);
 
-		const filteredUsers = userDocs.filter(
+		let filteredUsers = userDocs.filter(
 			(user: UserDocument) => !interactedUsers.includes(user.userId)
 		);
+
+		filteredUsers = filteredUsers.filter(
+			(user: UserDocument) => user.isOnboarded
+		);
+		console.log(filteredUsers);
 
 		res.status(200).json(filteredUsers);
 	} catch (error: unknown) {
