@@ -14,6 +14,7 @@ const userSchema = new mongoose.Schema(
 		bio: { type: String },
 		lookingFor: [{ type: String }],
 		profileImageUrl: { type: String },
+		isOnboarded: { type: Boolean, default: false },
 	},
 	{
 		collection: "users",
