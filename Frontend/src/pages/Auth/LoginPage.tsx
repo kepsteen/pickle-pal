@@ -1,4 +1,4 @@
-import { useClerk, useSignIn } from "@clerk/clerk-react";
+import { useAuth, useClerk, useSignIn } from "@clerk/clerk-react";
 import {
 	Card,
 	CardContent,
@@ -27,10 +27,14 @@ const loginSchema = z.object({
 });
 
 export default function LoginPage() {
+	const { isSignedIn } = useAuth();
 	const [isPending, setIsPending] = useState(false);
 	const [signInError, setSignInError] = useState<string | null>(null);
-
 	const navigate = useNavigate();
+
+	if (isSignedIn) {
+		navigate("/home");
+	}
 
 	const { signIn } = useSignIn();
 	const {
