@@ -15,6 +15,7 @@ export default function HomePage() {
 	const [profiles, setProfiles] = useState<ProfileData[] | undefined>([]);
 	const [maxDistance, setMaxDistance] = useState(25);
 	const [position, setPosition] = useState<GeolocationPosition | null>(null);
+	const [isLoadingPosition, setIsLoadingPosition] = useState(true);
 	const [swipeDirection, setSwipeDirection] = useState<"left" | "right" | null>(
 		null
 	);
@@ -24,16 +25,27 @@ export default function HomePage() {
 	// Update user location on mount
 	useEffect(() => {
 		const getLocation = async () => {
+			setIsLoadingPosition(true);
 			const token = await getToken();
 			if (token) {
-				navigator.geolocation.getCurrentPosition(async (position) => {
-					try {
-						setPosition(position);
-						await setLocation(position, token);
-					} catch (error) {
-						console.error("Failed to set location:", error);
+				navigator.geolocation.getCurrentPosition(
+					async (position) => {
+						try {
+							setPosition(position);
+							await setLocation(position, token);
+						} catch (error) {
+							console.error("Failed to set location:", error);
+						} finally {
+							setIsLoadingPosition(false);
+						}
+					},
+					(error) => {
+						console.error("Geolocation error:", error);
+						setIsLoadingPosition(false);
 					}
-				});
+				);
+			} else {
+				setIsLoadingPosition(false);
 			}
 		};
 		getLocation();
@@ -76,9 +88,20 @@ export default function HomePage() {
 		},
 	});
 
-	if (query.isLoading) return <div>Loading...</div>;
+	if (isLoadingPosition)
+		return (
+			<div className="mt-10 text-lg text-center">
+				Finding players near you...
+			</div>
+		);
+	if (query.isLoading)
+		return (
+			<div className="mt-10 text-lg text-center">Loading potential pals...</div>
+		);
 	if (query.isError)
-		return <div>{`Error loading profiles: ${query.error}`}</div>;
+		return (
+			<div className="mt-10 text-lg text-center text-error">{`Error loading profiles: ${query.error}`}</div>
+		);
 
 	const handleSwipeInteraction = (isLike: boolean) => {
 		setSwipeDirection(isLike ? "right" : "left");
