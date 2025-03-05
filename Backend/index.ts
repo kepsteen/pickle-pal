@@ -15,7 +15,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Define the path to the Frontend build directory
-const frontendBuildDir = path.join(__dirname, "..", "Frontend", "dist");
+const frontendBuildDir =
+	process.env.FRONTEND_BUILD_DIR ||
+	path.join(__dirname, "..", "Frontend", "dist");
 
 const app = express();
 const port = 3000;
