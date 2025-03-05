@@ -18,6 +18,7 @@ const __dirname = path.dirname(__filename);
 const frontendBuildDir =
 	process.env.FRONTEND_BUILD_DIR ||
 	path.join(__dirname, "..", "Frontend", "dist");
+console.log("Serving static files from:", frontendBuildDir);
 
 const app = express();
 const port = 3000;
