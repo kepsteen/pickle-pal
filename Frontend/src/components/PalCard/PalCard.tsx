@@ -1,7 +1,7 @@
 import { cn } from "../../lib/utils";
 import { ProfileData } from "../../types/user.types";
 import { Badge } from "../Badge/Badge";
-import { Card, CardContent, CardTitle } from "../Card/Card";
+import { Card, CardContent } from "../Card/Card";
 import { motion } from "framer-motion";
 
 function getSkillLevelBadgeVariant(skillLevel: string) {
@@ -34,23 +34,29 @@ type PalCardProps = {
 	profile: ProfileData;
 	className?: string;
 	swipeDirection: "left" | "right" | null;
+	disableAnimation?: boolean;
 };
 
 export default function PalCard({
 	profile,
 	className,
 	swipeDirection,
+	disableAnimation = false,
 }: PalCardProps) {
 	return (
 		<motion.div
-			initial={{ opacity: 0, x: 200 }}
+			initial={disableAnimation ? { opacity: 1, x: 0 } : { opacity: 0, x: 200 }}
 			animate={{ opacity: 1, x: 0 }}
-			exit={{
-				opacity: 0,
-				x: swipeDirection === "left" ? -200 : 200,
-				transition: { duration: 0.1 },
-			}}
-			whileHover={{ scale: 1.05 }}
+			exit={
+				disableAnimation
+					? { opacity: 0 }
+					: {
+							opacity: 0,
+							x: swipeDirection === "left" ? -200 : 200,
+							transition: { duration: 0.1 },
+					  }
+			}
+			whileHover={disableAnimation ? {} : { scale: 1.05 }}
 			transition={{ duration: 0.2 }}
 		>
 			<Card
@@ -59,24 +65,26 @@ export default function PalCard({
 					className
 				)}
 			>
-				<CardTitle className="pt-4 bg-base-200 rounded-t-md">
-					<div className="flex items-center gap-2">
-						<h1 className="text-3xl font-semibold">{profile.firstName}</h1>
-						<Badge
-							variant={getSkillLevelBadgeVariant(profile.skillLevel)}
-							size="lg"
-						>
-							{profile.skillLevel}
-						</Badge>
-					</div>
-				</CardTitle>
 				<CardContent className="flex flex-col gap-4 pt-4 bg-base-200 rounded-b-md">
-					<div className="flex-shrink-0 w-full h-56">
+					<div className="relative flex-shrink-0 w-full h-56">
 						<img
 							src={profile.profileImageUrl}
 							alt={`${profile.firstName}'s profile picture`}
 							className="object-cover object-top w-full h-full rounded-md"
 						/>
+						<div className="absolute top-0 left-0 w-full p-3 pb-8 bg-gradient-to-b from-black/80 via-black/50 to-transparent">
+							<div className="flex items-center gap-2">
+								<h1 className="text-xl font-semibold text-white">
+									{profile.firstName}
+								</h1>
+								<Badge
+									variant={getSkillLevelBadgeVariant(profile.skillLevel)}
+									size="md"
+								>
+									{profile.skillLevel}
+								</Badge>
+							</div>
+						</div>
 					</div>
 					<div>
 						<h2 className="flex-shrink-0 font-semibold">Playstyle</h2>

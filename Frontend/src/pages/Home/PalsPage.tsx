@@ -4,12 +4,14 @@ import { getPals } from "../../lib/api";
 import { useState, useEffect } from "react";
 import { ProfileData } from "../../types/user.types.ts";
 import { NavLink, useParams } from "react-router";
-import { ChevronLeft, EllipsisVerticalIcon } from "lucide-react";
+import { ChevronLeft, EllipsisVerticalIcon, X } from "lucide-react";
 import { cn } from "../../lib/utils.ts";
 import ChatWindow from "../../components/ChatWindow/ChatWindow.tsx";
 import { Socket } from "socket.io-client";
 import { ClientToServerEvents, ServerToClientEvents } from "../../socket.ts";
 import { useAuth } from "@clerk/clerk-react";
+import Button from "../../components/Button/Button";
+import PalCard from "../../components/PalCard/PalCard";
 
 interface PalsPageProps {
 	socket: Socket<ServerToClientEvents, ClientToServerEvents>;
@@ -17,6 +19,8 @@ interface PalsPageProps {
 export default function PalsPage({ socket }: PalsPageProps) {
 	const [pals, setPals] = useState<ProfileData[]>([]);
 	const [isChatOpen, setIsChatOpen] = useState(false);
+	const [selectedPal, setSelectedPal] = useState<ProfileData | null>(null);
+	const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 	const { userId } = useParams();
 	const { getToken } = useAuth();
 
@@ -39,6 +43,16 @@ export default function PalsPage({ socket }: PalsPageProps) {
 		retry: 3,
 		staleTime: 0,
 	});
+
+	const openProfileModal = (pal: ProfileData) => {
+		setSelectedPal(pal);
+		setIsProfileModalOpen(true);
+	};
+
+	const closeProfileModal = () => {
+		setIsProfileModalOpen(false);
+		setSelectedPal(null);
+	};
 
 	if (query.isLoading) return <div>Loading...</div>;
 	if (query.isError) return <div>Error: {query.error.message}</div>;
@@ -105,11 +119,55 @@ export default function PalsPage({ socket }: PalsPageProps) {
 										{pal.firstName}
 									</span>
 								</div>
-								<EllipsisVerticalIcon className="w-6 h-6 text-primary" />
+								<div className="dropdown dropdown-end">
+									<Button
+										variant="ghost"
+										tabIndex={0}
+										role="button"
+										className="p-0 hover:bg-transparent"
+									>
+										<EllipsisVerticalIcon className="w-6 h-6 text-primary" />
+									</Button>
+									<ul
+										tabIndex={0}
+										className="dropdown-content menu bg-base-200 rounded-box z-[1] w-52 shadow p-0"
+									>
+										<li>
+											<Button
+												variant="ghost"
+												onClick={() => openProfileModal(pal)}
+											>
+												View Profile
+											</Button>
+										</li>
+									</ul>
+								</div>
 							</div>
 						))}
 					<ChatWindow palId={userId} socket={socket} />
 				</section>
+			)}
+
+			{/* Profile Modal */}
+			{isProfileModalOpen && selectedPal && (
+				<div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+					<div className="relative w-full max-w-3xl p-4">
+						<Button
+							variant="ghost"
+							size="md"
+							className="absolute z-10 p-2 shadow-md top-4 right-4 bg-base-100 hover:bg-base-200"
+							onClick={closeProfileModal}
+						>
+							<X className="w-6 h-6" />
+						</Button>
+						<PalCard
+							profile={selectedPal}
+							swipeDirection={null}
+							className="mx-auto"
+							disableAnimation={true}
+						/>
+					</div>
+				</div>
 			)}
 		</main>
 	);

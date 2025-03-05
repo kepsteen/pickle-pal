@@ -23,28 +23,30 @@ export const SetLocation = ({
 	};
 
 	return (
-		<>
-			<p className="pb-2 text-center text-md text-primary">
-				{sliderValue} miles
-			</p>
-			<input
-				onChange={(e) => setSliderValue(Number(e.target.value))}
-				onMouseUp={() => setMaxDistance(sliderValue)}
-				onTouchEnd={() => setMaxDistance(sliderValue)}
-				type="range"
-				min={1}
-				max="100"
-				value={sliderValue} // Use local state for the slider value
-				className="w-2/3 mx-auto range range-primary"
-			/>
+		<div className="flex flex-col items-center w-full gap-2 sm:flex-row">
+			<div className="flex items-center flex-1 gap-2">
+				<input
+					onChange={(e) => setSliderValue(Number(e.target.value))}
+					onMouseUp={() => setMaxDistance(sliderValue)}
+					onTouchEnd={() => setMaxDistance(sliderValue)}
+					type="range"
+					min={1}
+					max="100"
+					value={sliderValue}
+					className="flex-1 range range-primary"
+				/>
+				<span className="text-xl font-semibold text-primary whitespace-nowrap">
+					{sliderValue} miles
+				</span>
+			</div>
 			<Button
 				size="sm"
-				className="w-48 mx-auto mt-4"
-				variant="ghost"
+				variant="neutral"
 				onClick={handleLocationUpdate}
+				className="whitespace-nowrap"
 			>
 				Update Location
 			</Button>
-		</>
+		</div>
 	);
 };
