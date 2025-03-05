@@ -4,9 +4,9 @@ import PalCard from "../../components/PalCard/PalCard";
 import SwipeButton from "../../components/SwipeButton/SwipeButton";
 import { ProfileData } from "../../types/user.types.ts";
 import { addLike, getNearbyUsers, setLocation } from "../../lib/api";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { SetLocation } from "../../components/SetLocation/SetLocation.tsx";
-import { formatCoordinates } from "../../lib/utils.ts";
+import { formatCoordinates, filterProfiles } from "../../lib/utils.ts";
 import { toast } from "react-hot-toast";
 import { MatchToast } from "../../components/Toast/Toast";
 import { useAuth } from "@clerk/clerk-react";
@@ -24,7 +24,6 @@ export default function HomePage() {
 		null
 	);
 	// filters state will be used for filtering functionality later
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const [filters, setFilters] = useState<ProfileFilters>({
 		duprRating: { min: 2, max: 8 },
 		lookingFor: {
@@ -39,6 +38,11 @@ export default function HomePage() {
 			Banger: false,
 		},
 	});
+
+	// Store the original unfiltered profiles
+	const [unfilteredProfiles, setUnfilteredProfiles] = useState<
+		ProfileData[] | undefined
+	>([]);
 
 	const { getToken } = useAuth();
 
@@ -82,12 +86,21 @@ export default function HomePage() {
 				maxDistance,
 				token
 			);
+			setUnfilteredProfiles(data);
 			setProfiles(data);
 			return data;
 		},
 		enabled: !!position,
 		refetchOnMount: true,
 	});
+
+	// Apply filters whenever filters or unfilteredProfiles change
+	useMemo(() => {
+		if (unfilteredProfiles) {
+			const filteredProfiles = filterProfiles(unfilteredProfiles, filters);
+			setProfiles(filteredProfiles);
+		}
+	}, [filters, unfilteredProfiles]);
 
 	const swipeMutation = useMutation({
 		mutationKey: ["swipe", profiles?.[0]?.userId],
@@ -131,7 +144,9 @@ export default function HomePage() {
 
 	const handleFilterChange = (newFilters: ProfileFilters) => {
 		setFilters(newFilters);
-		// Filtering functionality will be implemented later
+		// Apply filters to the unfiltered profiles
+		const filteredProfiles = filterProfiles(unfilteredProfiles, newFilters);
+		setProfiles(filteredProfiles);
 	};
 
 	return (
@@ -148,7 +163,7 @@ export default function HomePage() {
 			</div>
 
 			<div className="grid mt-3 place-content-center">
-				{profiles && profiles[0] && (
+				{profiles && profiles.length > 0 ? (
 					<AnimatePresence mode="wait">
 						<PalCard
 							key={profiles[0].userId}
@@ -156,6 +171,10 @@ export default function HomePage() {
 							swipeDirection={swipeDirection}
 						/>
 					</AnimatePresence>
+				) : (
+					<div className="mt-10 text-lg text-center">
+						No profiles match your current filters. Try adjusting your filters.
+					</div>
 				)}
 			</div>
 			{profiles && profiles.length !== 0 && (
