@@ -4,36 +4,72 @@ import PalCard from "../../components/PalCard/PalCard";
 import SwipeButton from "../../components/SwipeButton/SwipeButton";
 import { ProfileData } from "../../types/user.types.ts";
 import { addLike, getNearbyUsers, setLocation } from "../../lib/api";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { SetLocation } from "../../components/SetLocation/SetLocation.tsx";
-import { formatCoordinates } from "../../lib/utils.ts";
+import { formatCoordinates, filterProfiles } from "../../lib/utils.ts";
 import { toast } from "react-hot-toast";
 import { MatchToast } from "../../components/Toast/Toast";
 import { useAuth } from "@clerk/clerk-react";
+import {
+	ProfileFilter,
+	ProfileFilters,
+} from "../../components/ProfileFilter/ProfileFilter";
 
 export default function HomePage() {
 	const [profiles, setProfiles] = useState<ProfileData[] | undefined>([]);
 	const [maxDistance, setMaxDistance] = useState(25);
 	const [position, setPosition] = useState<GeolocationPosition | null>(null);
+	const [isLoadingPosition, setIsLoadingPosition] = useState(true);
 	const [swipeDirection, setSwipeDirection] = useState<"left" | "right" | null>(
 		null
 	);
+	// filters state will be used for filtering functionality later
+	const [filters, setFilters] = useState<ProfileFilters>({
+		duprRating: { min: 2, max: 8 },
+		lookingFor: {
+			competitive: false,
+			casual: false,
+			friends: false,
+			drilling: false,
+		},
+		playStyle: {
+			Dinker: false,
+			Hybrid: false,
+			Banger: false,
+		},
+	});
+
+	// Store the original unfiltered profiles
+	const [unfilteredProfiles, setUnfilteredProfiles] = useState<
+		ProfileData[] | undefined
+	>([]);
 
 	const { getToken } = useAuth();
 
 	// Update user location on mount
 	useEffect(() => {
 		const getLocation = async () => {
+			setIsLoadingPosition(true);
 			const token = await getToken();
 			if (token) {
-				navigator.geolocation.getCurrentPosition(async (position) => {
-					try {
-						setPosition(position);
-						await setLocation(position, token);
-					} catch (error) {
-						console.error("Failed to set location:", error);
+				navigator.geolocation.getCurrentPosition(
+					async (position) => {
+						try {
+							setPosition(position);
+							await setLocation(position, token);
+						} catch (error) {
+							console.error("Failed to set location:", error);
+						} finally {
+							setIsLoadingPosition(false);
+						}
+					},
+					(error) => {
+						console.error("Geolocation error:", error);
+						setIsLoadingPosition(false);
 					}
-				});
+				);
+			} else {
+				setIsLoadingPosition(false);
 			}
 		};
 		getLocation();
@@ -50,12 +86,21 @@ export default function HomePage() {
 				maxDistance,
 				token
 			);
+			setUnfilteredProfiles(data);
 			setProfiles(data);
 			return data;
 		},
 		enabled: !!position,
 		refetchOnMount: true,
 	});
+
+	// Apply filters whenever filters or unfilteredProfiles change
+	useMemo(() => {
+		if (unfilteredProfiles) {
+			const filteredProfiles = filterProfiles(unfilteredProfiles, filters);
+			setProfiles(filteredProfiles);
+		}
+	}, [filters, unfilteredProfiles]);
 
 	const swipeMutation = useMutation({
 		mutationKey: ["swipe", profiles?.[0]?.userId],
@@ -76,14 +121,32 @@ export default function HomePage() {
 		},
 	});
 
-	if (query.isLoading) return <div>Loading...</div>;
+	if (isLoadingPosition)
+		return (
+			<div className="mt-10 text-lg text-center">
+				Finding players near you...
+			</div>
+		);
+	if (query.isLoading)
+		return (
+			<div className="mt-10 text-lg text-center">Loading potential pals...</div>
+		);
 	if (query.isError)
-		return <div>{`Error loading profiles: ${query.error}`}</div>;
+		return (
+			<div className="mt-10 text-lg text-center text-error">{`Error loading profiles: ${query.error}`}</div>
+		);
 
 	const handleSwipeInteraction = (isLike: boolean) => {
 		setSwipeDirection(isLike ? "right" : "left");
 		swipeMutation.mutate(isLike);
 		setProfiles((prev) => prev?.slice(1) || []);
+	};
+
+	const handleFilterChange = (newFilters: ProfileFilters) => {
+		setFilters(newFilters);
+		// Apply filters to the unfiltered profiles
+		const filteredProfiles = filterProfiles(unfilteredProfiles, newFilters);
+		setProfiles(filteredProfiles);
 	};
 
 	return (
@@ -93,8 +156,14 @@ export default function HomePage() {
 				setMaxDistance={setMaxDistance}
 				setPosition={setPosition}
 			/>
-			<div className="grid mt-10 place-content-center">
-				{profiles && profiles[0] && (
+
+			{/* Profile Filter UI */}
+			<div className="mt-2">
+				<ProfileFilter onFilterChange={handleFilterChange} />
+			</div>
+
+			<div className="grid mt-3 place-content-center">
+				{profiles && profiles.length > 0 ? (
 					<AnimatePresence mode="wait">
 						<PalCard
 							key={profiles[0].userId}
@@ -102,10 +171,14 @@ export default function HomePage() {
 							swipeDirection={swipeDirection}
 						/>
 					</AnimatePresence>
+				) : (
+					<div className="mt-10 text-lg text-center">
+						No profiles match your current filters. Try adjusting your filters.
+					</div>
 				)}
 			</div>
 			{profiles && profiles.length !== 0 && (
-				<div className="flex justify-center gap-8 mt-8">
+				<div className="flex justify-center gap-8 mt-6">
 					<SwipeButton
 						variant="dislike"
 						onClick={() => handleSwipeInteraction(false)}

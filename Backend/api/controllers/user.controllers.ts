@@ -51,29 +51,40 @@ export const updateProfile = async (req: Request, res: Response) => {
 			return res.status(401).json({ error: "Unauthorized" });
 		}
 		const profileImage = req.file;
-		const { firstName, skillLevel, playStyle, duprRating, bio, lookingFor } =
-			req.body;
-		if (!profileImage) {
-			return res.status(400).json({ error: "Profile image is required" });
-		}
+		const {
+			firstName,
+			skillLevel,
+			playStyle,
+			duprRating,
+			bio,
+			lookingFor,
+			isOnboarded,
+		} = req.body;
 
-		const imageName = formatUserImageName(
-			profileImage.originalname,
-			userId,
-			"profileImgs"
-		);
-
-		await uploadToS3(profileImage.buffer, imageName, userId);
-
-		let updateData = {
+		// Initialize update data without profile image
+		let updateData: any = {
 			firstName,
 			skillLevel,
 			playStyle,
 			duprRating,
 			bio,
 			lookingFor: JSON.parse(lookingFor),
-			profileImageUrl: `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${imageName}`,
+			isOnboarded,
 		};
+
+		// If profile image is provided, upload it and update the URL
+		if (profileImage) {
+			const imageName = formatUserImageName(
+				profileImage.originalname,
+				userId,
+				"profileImgs"
+			);
+
+			await uploadToS3(profileImage.buffer, imageName, userId);
+
+			// Add the new profile image URL to the update data
+			updateData.profileImageUrl = `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${imageName}`;
+		}
 
 		const updatedProfile = await User.findOneAndUpdate({ userId }, updateData, {
 			new: true,

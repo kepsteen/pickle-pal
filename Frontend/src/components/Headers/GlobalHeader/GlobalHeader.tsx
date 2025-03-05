@@ -1,4 +1,4 @@
-import { Home, Bell, MessageSquare, UserCog, Users } from "lucide-react";
+import { Home, MessageSquare, UserCog, Users } from "lucide-react";
 import { useState, useEffect } from "react";
 import { NavLink } from "react-router";
 
@@ -53,16 +53,6 @@ export default function GlobalHeader() {
 									<Users />
 								</NavLink>
 							</li>
-							{/* <li>
-								<NavLink
-									to="/map"
-									className={({ isActive }) =>
-										`block p-2 ${isActive ? "border-b-4 border-b-primary" : ""}`
-									}
-								>
-									<MapPinned />
-								</NavLink>
-							</li> */}
 							<li>
 								<NavLink
 									to="/home"
@@ -86,7 +76,7 @@ export default function GlobalHeader() {
 						</ul>
 					</li>
 					<div className="flex gap-4 justify-end [&_svg]:text-base-content relative">
-						<li>
+						{/* <li>
 							<NavLink
 								to="/notifications"
 								className={({ isActive }) =>
@@ -98,7 +88,7 @@ export default function GlobalHeader() {
 								<Bell />
 								<span className="absolute w-2 h-2 rounded-full top-1 right-1 bg-primary" />
 							</NavLink>
-						</li>
+						</li> */}
 						<li>
 							<NavLink
 								to="/settings"

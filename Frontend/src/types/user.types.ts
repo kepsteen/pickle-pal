@@ -12,8 +12,8 @@ export const profileSchema = z.object({
 	}),
 	duprRating: z.coerce
 		.number()
-		.min(2.0, "DUPR Rating must be between 2 and 8")
-		.max(8.0, "DUPR Rating must be between 2 and 8"),
+		.min(1.9, "DUPR Rating must be between 2 and 8")
+		.max(8.1, "DUPR Rating must be between 2 and 8"),
 	bio: z.string().min(1, "Bio is required").max(500),
 	profileImage: z.instanceof(FileList).refine((files) => files.length > 0, {
 		message: "Profile image is required",

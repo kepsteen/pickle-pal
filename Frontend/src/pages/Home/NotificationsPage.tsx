@@ -44,7 +44,7 @@ const InviteLink = () => {
 	return <NavLink to="/pair-swipe">Join Session</NavLink>;
 };
 
-const Message = () => {
+const MessageLink = () => {
 	return <NavLink to="/pals">View Message</NavLink>;
 };
 
@@ -55,9 +55,9 @@ export default function NotificationsPage() {
 	const renderNotificationAction = (type: Notification["type"]) => {
 		switch (type) {
 			case "message":
-				return <Message />;
+				return <MessageLink />;
 			case "match":
-				return <Message />;
+				return <MessageLink />;
 			case "pair-swipe-invite":
 				return <InviteLink />;
 		}

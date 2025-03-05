@@ -20,6 +20,7 @@ export interface UserDocument {
 	bio?: string;
 	lookingFor?: string[];
 	profileImageUrl?: string;
+	isOnboarded?: boolean;
 }
 
 export interface User {
@@ -32,6 +33,7 @@ export interface User {
 	bio?: string;
 	lookingFor?: string[];
 	profileImageUrl?: string;
+	isOnboarded?: boolean;
 }
 
 export interface AddLikeResponse {

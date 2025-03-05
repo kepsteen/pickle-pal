@@ -31,6 +31,14 @@ function App() {
 								</ProtectedRoute>
 							}
 						/>
+						<Route
+							path="edit-profile"
+							element={
+								<ProtectedRoute>
+									<OnboardingPage isEditing={true} />
+								</ProtectedRoute>
+							}
+						/>
 					</Route>
 					<Route
 						element={

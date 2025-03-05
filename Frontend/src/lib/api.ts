@@ -44,6 +44,23 @@ export async function setLocation(
 	}
 }
 
+export async function getLocation(token: string) {
+	try {
+		const response = await fetch("/api/locations", {
+			method: "GET",
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: `Bearer ${token}`,
+			},
+		});
+		if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
+		return await response.json();
+	} catch (error) {
+		console.error("Error setting location:", error);
+		throw new Error(`Failed to set location`);
+	}
+}
+
 export async function getNearbyUsers(
 	coordinates: number[],
 	maxDistance: number,
