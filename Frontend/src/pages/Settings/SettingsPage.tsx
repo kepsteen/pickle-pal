@@ -107,7 +107,7 @@ export default function SettingsPage() {
 											</div>
 										</div>
 										<div className="mt-3">
-											<NavLink to="/onboarding" className="inline-block">
+											<NavLink to="/edit-profile" className="inline-block">
 												<Button variant="primary" size="xs">
 													Edit Profile
 												</Button>

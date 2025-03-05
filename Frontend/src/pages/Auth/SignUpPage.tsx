@@ -1,4 +1,4 @@
-import { useSignUp } from "@clerk/clerk-react";
+import { useSignUp, useClerk } from "@clerk/clerk-react";
 import {
 	Card,
 	CardContent,
@@ -20,6 +20,7 @@ import useRefinement from "../../hooks/useRefinement";
 export default function SignUpPage() {
 	const [isPending, setIsPending] = useState(false);
 	const { signUp } = useSignUp();
+	const { setActive } = useClerk();
 
 	const uniqueEmail = useRefinement(checkEmailToBeUnique(), {
 		debounce: 1000,
@@ -47,7 +48,14 @@ export default function SignUpPage() {
 				emailAddress: data.email,
 				password: data.password,
 			});
-			signUp?.reload();
+
+			// Complete the sign up process
+			await signUp?.reload();
+
+			// Activate the session to properly sign in the user
+			if (clerkResponse?.createdSessionId) {
+				await setActive({ session: clerkResponse.createdSessionId });
+			}
 
 			const response = await fetch(`/api/users`, {
 				method: "POST",

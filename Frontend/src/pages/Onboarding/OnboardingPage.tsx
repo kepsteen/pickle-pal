@@ -11,8 +11,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { profileSchema } from "../../types/user.types";
 import { DUPRRangeInput } from "../../components/DUPRRangeInput/DUPRRangeInput";
 import { useAuth } from "@clerk/clerk-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router";
+import { useQuery } from "@tanstack/react-query";
+import { getUserById } from "../../lib/api";
+import { z } from "zod";
 
 type OnboardingPageProps = {
 	isEditing: boolean;
@@ -30,20 +33,81 @@ export default function OnboardingPage({ isEditing }: OnboardingPageProps) {
 		}
 	}, [clerkId, isLoaded]);
 
+	const { data: profileData, isSuccess } = useQuery({
+		queryKey: ["profileData"],
+		queryFn: async () => {
+			if (!clerkId) return undefined;
+			return await getUserById(clerkId, getToken);
+		},
+		enabled: !!clerkId && isEditing,
+	});
+
+	// Create a conditional schema based on isEditing
+	const conditionalSchema = useMemo(() => {
+		// If editing, make profileImage optional
+		if (isEditing) {
+			return profileSchema.extend({
+				profileImage: z.instanceof(FileList).optional(),
+			});
+		}
+		// Otherwise, use the original schema (profileImage required)
+		return profileSchema;
+	}, [isEditing]);
+
 	const {
 		register,
 		handleSubmit,
 		formState: { errors },
+		reset,
+		watch,
 	} = useForm<ProfileFormData>({
-		resolver: zodResolver(profileSchema),
+		resolver: zodResolver(conditionalSchema),
 		defaultValues: {
 			firstName: "",
 			skillLevel: "Beginner",
 			playStyle: "Hybrid",
 			duprRating: 2,
 			bio: "",
+			lookingFor: {
+				casual: false,
+				competitive: false,
+				friends: false,
+				drilling: false,
+			},
 		},
 	});
+
+	// Watch the duprRating value to pass to the DUPRRangeInput component
+	const duprRating = watch("duprRating");
+
+	// Prefill form when profileData is available and isEditing is true
+	useEffect(() => {
+		if (isSuccess && profileData && isEditing) {
+			// Convert lookingFor array to object format expected by the form
+			const lookingForObject = {
+				casual: profileData.lookingFor.includes("casual"),
+				competitive: profileData.lookingFor.includes("competitive"),
+				friends: profileData.lookingFor.includes("friends"),
+				drilling: profileData.lookingFor.includes("drilling"),
+			};
+
+			// Set the profile image preview if available
+			if (profileData.profileImageUrl) {
+				setSelectedImage(profileData.profileImageUrl);
+			}
+
+			// Reset form with profile data
+			reset({
+				firstName: profileData.firstName,
+				skillLevel: profileData.skillLevel,
+				playStyle: profileData.playStyle,
+				duprRating: profileData.duprRating,
+				bio: profileData.bio,
+				lookingFor: lookingForObject,
+				// We don't prefill profileImage as it's a FileList and can't be set directly
+			});
+		}
+	}, [profileData, isSuccess, isEditing, reset]);
 
 	async function onSubmit(data: ProfileFormData) {
 		try {
@@ -113,6 +177,11 @@ export default function OnboardingPage({ isEditing }: OnboardingPageProps) {
 								preview={selectedImage}
 							/>
 							<span className="text-error">{errors.profileImage?.message}</span>
+							{isEditing && (
+								<span className="text-xs text-base-content/60">
+									Leave empty to keep current image
+								</span>
+							)}
 						</Label>
 						<Label>
 							Name
@@ -195,7 +264,7 @@ export default function OnboardingPage({ isEditing }: OnboardingPageProps) {
 						</Label>
 						<Label>
 							DUPR Rating
-							<DUPRRangeInput {...register("duprRating")} />
+							<DUPRRangeInput {...register("duprRating")} value={duprRating} />
 							<span className="text-error">{errors.duprRating?.message}</span>
 						</Label>
 						<Label>
@@ -212,7 +281,11 @@ export default function OnboardingPage({ isEditing }: OnboardingPageProps) {
 								isEditing ? "justify-between" : "justify-end"
 							)}
 						>
-							{isEditing && <Button variant="neutral">Cancel</Button>}
+							{isEditing && (
+								<Button variant="neutral" onClick={() => navigate(-1)}>
+									Cancel
+								</Button>
+							)}
 							<Button>{isEditing ? "Update Profile" : "Create Profile"}</Button>
 						</div>
 					</form>
