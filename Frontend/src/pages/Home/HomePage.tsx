@@ -10,6 +10,10 @@ import { formatCoordinates } from "../../lib/utils.ts";
 import { toast } from "react-hot-toast";
 import { MatchToast } from "../../components/Toast/Toast";
 import { useAuth } from "@clerk/clerk-react";
+import {
+	ProfileFilter,
+	ProfileFilters,
+} from "../../components/ProfileFilter/ProfileFilter";
 
 export default function HomePage() {
 	const [profiles, setProfiles] = useState<ProfileData[] | undefined>([]);
@@ -19,6 +23,22 @@ export default function HomePage() {
 	const [swipeDirection, setSwipeDirection] = useState<"left" | "right" | null>(
 		null
 	);
+	// filters state will be used for filtering functionality later
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	const [filters, setFilters] = useState<ProfileFilters>({
+		duprRating: { min: 2, max: 8 },
+		lookingFor: {
+			competitive: false,
+			casual: false,
+			friends: false,
+			drilling: false,
+		},
+		playStyle: {
+			Dinker: false,
+			Hybrid: false,
+			Banger: false,
+		},
+	});
 
 	const { getToken } = useAuth();
 
@@ -109,6 +129,11 @@ export default function HomePage() {
 		setProfiles((prev) => prev?.slice(1) || []);
 	};
 
+	const handleFilterChange = (newFilters: ProfileFilters) => {
+		setFilters(newFilters);
+		// Filtering functionality will be implemented later
+	};
+
 	return (
 		<>
 			<SetLocation
@@ -116,7 +141,13 @@ export default function HomePage() {
 				setMaxDistance={setMaxDistance}
 				setPosition={setPosition}
 			/>
-			<div className="grid mt-10 place-content-center">
+
+			{/* Profile Filter UI */}
+			<div className="mt-2">
+				<ProfileFilter onFilterChange={handleFilterChange} />
+			</div>
+
+			<div className="grid mt-3 place-content-center">
 				{profiles && profiles[0] && (
 					<AnimatePresence mode="wait">
 						<PalCard
@@ -128,7 +159,7 @@ export default function HomePage() {
 				)}
 			</div>
 			{profiles && profiles.length !== 0 && (
-				<div className="flex justify-center gap-8 mt-8">
+				<div className="flex justify-center gap-8 mt-6">
 					<SwipeButton
 						variant="dislike"
 						onClick={() => handleSwipeInteraction(false)}
